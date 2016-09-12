@@ -13,4 +13,17 @@ var connector = new builder.ChatConnector({
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
-bot.dialog('/', dialog);
+bot.dialog('/', [
+    function(session) {
+        builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
+        
+    },
+    function(session, results) {
+        if (results.response.entity === 'Get Stats') {
+            builder.Prompts.text(session, 'What player are you looking for?');
+        }
+    },
+    function(session, results) {
+        session.send(results.response);
+    }
+]);
