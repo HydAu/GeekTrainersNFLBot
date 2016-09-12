@@ -46,7 +46,7 @@ jspm_packages
 
 
 ### VisualStudioCode ###
-.vscode/*
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -71,6 +71,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# VisualCode
-.vscode/
