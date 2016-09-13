@@ -15,14 +15,38 @@ var playerThumbnails = [];
 var teamThumbnails = [];
 var positionChosen = null;
 var teams = [
-    { teamname: 'Chargers', abbr: 'SD' }, { teamname: 'Broncos', abbr: 'DEN' }, { teamname: 'Raiders', abbr: 'OAK' }, { teamname: 'Chiefs', abbr: 'KC' },
-    { teamname: 'Jaguars', abbr: 'JAX' }, { teamname: 'Titans', abbr: 'TEN' }, { teamname: 'Texans', abbr: 'HOU' }, { teamname: 'Colts', abbr: 'IND' },
-    { teamname: 'Patriots', abbr: 'NE' }, { teamname: 'Jets', abbr: 'NYJ' }, { teamname: 'Bills', abbr: 'BUF' }, { teamname: 'Dolphins', abbr: 'MIA' },
-    { teamname: 'Steelers', abbr: 'PIT' }, { teamname: 'Ravens', abbr: 'BAL' }, { teamname: 'Bengals', abbr: 'CIN' }, { teamname: 'Browns', abbr: 'CLE' },
-    { teamname: 'Panthers', abbr: 'CAR' }, { teamname: 'Falcons', abbr: 'ATL' }, { teamname: 'Saints', abbr: 'NO' }, { teamname: 'Buccaneers', abbr: 'TB' },
-    { teamname: 'Packers', abbr: 'GB' }, { teamname: 'Vikings', abbr: 'MIN' }, { teamname: 'Bears', abbr: 'CHI' }, { teamname: 'Lions', abbr: 'DET' },
-    { teamname: '49ers', abbr: 'SF' }, { teamname: 'Cardinals', abbr: 'ARI' }, { teamname: 'Rams', abbr: 'LA' }, { teamname: 'Seahawks', abbr: 'SEA' },
-    { teamname: 'Cowboys', abbr: 'DAL' }, { teamname: 'Redskins', abbr: 'WAS' }, { teamname: 'Giants', abbr: 'NYG' }, { teamname: 'Eagles', abbr: 'PHI' },
+    { teamname: 'San Diego Chargers', abbr: 'SD' }, 
+    { teamname: 'Denver Broncos', abbr: 'DEN' }, 
+    { teamname: 'Oakland Raiders', abbr: 'OAK' }, 
+    { teamname: 'Kansas City Chiefs', abbr: 'KC' },
+    { teamname: 'Jacksonville Jaguars', abbr: 'JAX' }, 
+    { teamname: 'Tennessee Titans', abbr: 'TEN' }, 
+    { teamname: 'Houston Texans', abbr: 'HOU' }, 
+    { teamname: 'Indianapolis Colts', abbr: 'IND' },
+    { teamname: 'New England Patriots', abbr: 'NE' }, 
+    { teamname: 'New York Jets', abbr: 'NYJ' }, 
+    { teamname: 'Buffalo Bills', abbr: 'BUF' }, 
+    { teamname: 'Miami Dolphins', abbr: 'MIA' },
+    { teamname: 'Pittsburgh Steelers', abbr: 'PIT' }, 
+    { teamname: 'Baltimore Ravens', abbr: 'BAL' }, 
+    { teamname: 'Cincinnati Bengals', abbr: 'CIN' }, 
+    { teamname: 'Cleveland Browns', abbr: 'CLE' },
+    { teamname: 'Carolina Panthers', abbr: 'CAR' }, 
+    { teamname: 'Atlanta Falcons', abbr: 'ATL' }, 
+    { teamname: 'New Orleans Saints', abbr: 'NO' }, 
+    { teamname: 'Tampa Bay Buccaneers', abbr: 'TB' },
+    { teamname: 'Green Bay Packers', abbr: 'GB' }, 
+    { teamname: 'Minnesota Vikings', abbr: 'MIN' }, 
+    { teamname: 'Chicago Bears', abbr: 'CHI' }, 
+    { teamname: 'Detriot Lions', abbr: 'DET' },
+    { teamname: 'San Francisco 49ers', abbr: 'SF' }, 
+    { teamname: 'Arizona Cardinals', abbr: 'ARI' }, 
+    { teamname: 'Los Angeles Rams', abbr: 'LA' }, 
+    { teamname: 'Seattle Seahawks', abbr: 'SEA' },
+    { teamname: 'Dallas Cowboys', abbr: 'DAL' }, 
+    { teamname: 'Washington Redskins', abbr: 'WAS' }, 
+    { teamname: 'New York Giants', abbr: 'NYG' }, 
+    { teamname: 'Philadelphia Eagles', abbr: 'PHI' },
 ]
 
 var connector = new builder.ChatConnector({
@@ -102,7 +126,9 @@ function getCurrentTeamThumbnail(session, teamobj) {
     }
     thumbnail.title(teamobj.teamname);
     var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + teamobj.abbr + '/' + teamobj.abbr + '_logo-80x90.gif';
-    thumbnail.images([builder.CardImage.create(session, imageUrl)]);
+    thumbnail.images([builder.CardImage.create(session, imageUrl)]).buttons([
+        builder.CardAction.imBack(session, team.teamname, 'Select')
+    ]);
     return thumbnail;
 }
 
