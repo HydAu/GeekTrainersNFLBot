@@ -119,16 +119,15 @@ bot.dialog('/', [
     function (session, results) { // Get potential players from teamname/position
         teamChosen = results.response;
         // positionChosen
-        sql.getPlayerList(positionChosen, teamChosen, function(response) {
+        sql.getPlayerList(positionChosen, teamChosen, function (response) {
             for (var i = 0; i < response.length; i++) {
                 var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
                 playerTeamThumbnails.push(thumbnail);
             }
+            playerTeamThumbnails = sortByScore(playerTeamThumbnails);
+            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+            session.send(message);
         });
-
-        playerTeamThumbnails = sortByScore(playerTeamThumbnails);
-        var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
-        session.send(message);
     }
 ]);
 
