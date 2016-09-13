@@ -117,7 +117,10 @@ bot.dialog('/', [
     },
     function (session, results) { // Get potential players from teamname/position
         console.log('---------------------------------------')
-        console.log(results.response.entity);
+        console.log(results.response);
+        console.log(positionChosen);
+        console.log('---------------------------------------')
+        
     }
 ]);
 
