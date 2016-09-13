@@ -84,7 +84,7 @@ function getPlayerThumbnailWithButton(session, player) {
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
     thumbnail.buttons([
-        builder.CardAction.imBack(session,player.displayName,player.displayName)
+        builder.CardAction.imBack(session,player.displayName, 'Select')
     ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
