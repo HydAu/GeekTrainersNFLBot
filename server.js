@@ -52,8 +52,9 @@ bot.dialog('/', [
         if (results.response.entity == 'Yes') {
             builder.Prompts.choice(session, 'Which stats are you looking for?', ['Projections', 'Record']);
         } else {
+            playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
-            session.send(message); 
+            session.send(message);
             builder.Prompts.choice(session, '', ['Player Not Listed']);
         }
     },
@@ -80,12 +81,13 @@ function getPlayerThumbnail(session, player) {
 };
 function getPlayerThumbnailWithButton(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.data.score = player.score;
     thumbnail.title(player.displayName);
     var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
     thumbnail.buttons([
-        builder.CardAction.imBack(session,player.displayName, 'Select')
+        builder.CardAction.imBack(session, player.displayName, 'Select')
     ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
@@ -111,4 +113,26 @@ function loadData(path, callback) {
         });
     });
     request.end();
-} 
+}
+function sortByScore(thumbnails) {
+    for (var i = 0; i < thumbnails.length; i++) {
+        var maximumScore = 0;
+        var maxIndex;
+        for (var j = i; j < thumbnails.length; j++) {
+            if (thumbnails[j].data.score > maximumScore) {
+                maximumScore = thumbnails[j].data.score;
+                maxIndex = j;
+            };
+        }
+        if (maxIndex != null) {
+            var temp = thumbnails[i];
+            thumbnails[i] = thumbnails[maxIndex];
+            thumbnails[maxIndex] = temp;
+        }
+    }
+    console.log('---------------------')
+    for (var i = 0; i < thumbnails.length; i++) {
+        console.log(thumbnails[i].data.score);
+    }
+    return thumbnails;
+}

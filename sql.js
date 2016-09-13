@@ -13,7 +13,7 @@ var wrapper = function () {
 
     self.getPlayerData = function (player, callback) {
         self.sql.execute({
-            query: "SELECT TOP 1 * from player where displayName = @player",
+            query: "SELECT TOP 1 * from player where displayName = @player order by score desc",
             params: {
                 player: {
                     type: self.sql.NVARCHAR,
