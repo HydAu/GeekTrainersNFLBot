@@ -12,16 +12,17 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 var playersReturnedFromSearch = [];
 var playerThumbnails = [];
+var teamThumbnails = [];
 var positionChosen = null;
 var teams = [
-    {teamname:'Chargers', abbr:'SD'}, {teamname:'Broncos', abbr:'DEN'}, {teamname:'Raiders', abbr:'OAK'}, {teamname:'Chiefs', abbr:'KC'}, 
-    {teamname:'Jaguars', abbr:'JAX'}, {teamname:'Titans', abbr:'TEN'}, {teamname:'Texans', abbr:'HOU'}, {teamname:'Colts', abbr:'IND'}, 
-    {teamname:'Patriots', abbr:'NE'}, {teamname:'Jets', abbr:'NYJ'}, {teamname:'Bills', abbr:'BUF'}, {teamname:'Dolphins', abbr:'MIA'},
-    {teamname:'Steelers', abbr:'PIT'}, {teamname:'Ravens', abbr:'BAL'}, {teamname:'Bengals', abbr:'CIN'}, {teamname:'Browns', abbr:'CLE'}, 
-    {teamname:'Panthers', abbr:'CAR'}, {teamname:'Falcons', abbr:'ATL'}, {teamname:'Saints', abbr:'NO'}, {teamname:'Buccaneers', abbr:'TB'},
-    {teamname:'Packers', abbr:'GB'}, {teamname:'Vikings', abbr:'MIN'}, {teamname:'Bears', abbr:'CHI'}, {teamname:'Lions', abbr:'DET'}, 
-    {teamname:'49ers', abbr:'SF'}, {teamname:'Cardinals', abbr:'ARI'}, {teamname:'Rams', abbr:'LA'}, {teamname:'Seahawks', abbr:'SEA'},
-    {teamname:'Cowboys', abbr:'DAL'}, {teamname:'Redskins', abbr:'WAS'}, {teamname:'Giants', abbr:'NYG'}, {teamname:'Eagles', abbr:'PHI'},
+    { teamname: 'Chargers', abbr: 'SD' }, { teamname: 'Broncos', abbr: 'DEN' }, { teamname: 'Raiders', abbr: 'OAK' }, { teamname: 'Chiefs', abbr: 'KC' },
+    { teamname: 'Jaguars', abbr: 'JAX' }, { teamname: 'Titans', abbr: 'TEN' }, { teamname: 'Texans', abbr: 'HOU' }, { teamname: 'Colts', abbr: 'IND' },
+    { teamname: 'Patriots', abbr: 'NE' }, { teamname: 'Jets', abbr: 'NYJ' }, { teamname: 'Bills', abbr: 'BUF' }, { teamname: 'Dolphins', abbr: 'MIA' },
+    { teamname: 'Steelers', abbr: 'PIT' }, { teamname: 'Ravens', abbr: 'BAL' }, { teamname: 'Bengals', abbr: 'CIN' }, { teamname: 'Browns', abbr: 'CLE' },
+    { teamname: 'Panthers', abbr: 'CAR' }, { teamname: 'Falcons', abbr: 'ATL' }, { teamname: 'Saints', abbr: 'NO' }, { teamname: 'Buccaneers', abbr: 'TB' },
+    { teamname: 'Packers', abbr: 'GB' }, { teamname: 'Vikings', abbr: 'MIN' }, { teamname: 'Bears', abbr: 'CHI' }, { teamname: 'Lions', abbr: 'DET' },
+    { teamname: '49ers', abbr: 'SF' }, { teamname: 'Cardinals', abbr: 'ARI' }, { teamname: 'Rams', abbr: 'LA' }, { teamname: 'Seahawks', abbr: 'SEA' },
+    { teamname: 'Cowboys', abbr: 'DAL' }, { teamname: 'Redskins', abbr: 'WAS' }, { teamname: 'Giants', abbr: 'NYG' }, { teamname: 'Eagles', abbr: 'PHI' },
 ]
 
 var connector = new builder.ChatConnector({
@@ -36,6 +37,9 @@ bot.dialog('/', [
 
     },
     function (session, results) {
+        for (var i = 0; i < teams.length; i++) {
+            teamThumbnails.push(getCurrentTeamThumbnail(session, teams[i]));
+        }
         if (results.response.entity === 'Get Stats') {
             builder.Prompts.text(session, 'What player are you looking for?');
         }
@@ -81,17 +85,26 @@ bot.dialog('/', [
         }
     },
     function (session, results) { // "What Position does this player play?" // ShowTeams
+        console.log(teamThumbnails);
         positionChosen = results.response.entity;
-        
+        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
+        session.send(message);
     },
 ]);
 
 function getCurrentTeamThumbnail(session, teamobj) {
     var thumbnail = new builder.ThumbnailCard(session);
+    if (teamobj.teamname == undefined || teamobj.teamname == null) {
+        throw "something ain't right.";
+    }
+    if (teamobj.abbr == undefined || teamobj.abbr == null) {
+        throw "something ain't right.";
+    }
     thumbnail.title(teamobj.teamname);
     var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + teamobj.abbr + '/' + teamobj.abbr + '_logo-80x90.gif';
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
-} 
+    return thumbnail;
+}
 
 function getPlayerThumbnail(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
