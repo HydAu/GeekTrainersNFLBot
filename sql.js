@@ -21,7 +21,6 @@ var wrapper = function () {
                 }
             }
         }).then(function (res) {
-            console.log(res[0]);
             callback(res[0]);
         }, function (err) {
             console.log("Something bad happened:", err);
