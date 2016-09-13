@@ -14,14 +14,14 @@ var playersReturnedFromSearch = [];
 var playerThumbnails = [];
 var positionChosen = null;
 var teams = [
-    'SD', 'DEN', 'OAK', 'KC', 
-    'JAX', 'TEN', 'HOU', 'IND', 
-    'NE', 'NYJ', 'BUF', 'MIA',
-    'PIT', 'BAL', 'CIN', 'CLE', 
-    'CAR', 'ATL', 'NO', 'TB',
-    'GB', 'MIN', 'CHI', 'DET', 
-    'SF', 'ARI', 'LA', 'SEA',
-    'DAL', 'WAS', 'NYG', 'PHI'
+    {teamname:'Chargers', abbr:'SD'}, {teamname:'Broncos', abbr:'DEN'}, {teamname:'Raiders', abbr:'OAK'}, {teamname:'Chiefs', abbr:'KC'}, 
+    {teamname:'Jaguars', abbr:'JAX'}, {teamname:'Titans', abbr:'TEN'}, {teamname:'Texans', abbr:'HOU'}, {teamname:'Colts', abbr:'IND'}, 
+    {teamname:'Patriots', abbr:'NE'}, {teamname:'Jets', abbr:'NYJ'}, {teamname:'Bills', abbr:'BUF'}, {teamname:'Dolphins', abbr:'MIA'},
+    {teamname:'Steelers', abbr:'PIT'}, {teamname:'Ravens', abbr:'BAL'}, {teamname:'Bengals', abbr:'CIN'}, {teamname:'Browns', abbr:'CLE'}, 
+    {teamname:'Panthers', abbr:'CAR'}, {teamname:'Falcons', abbr:'ATL'}, {teamname:'Saints', abbr:'NO'}, {teamname:'Buccaneers', abbr:'TB'},
+    {teamname:'Packers', abbr:'GB'}, {teamname:'Vikings', abbr:'MIN'}, {teamname:'Bears', abbr:'CHI'}, {teamname:'Lions', abbr:'DET'}, 
+    {teamname:'49ers', abbr:'SF'}, {teamname:'Cardinals', abbr:'ARI'}, {teamname:'Rams', abbr:'LA'}, {teamname:'Seahawks', abbr:'SEA'},
+    {teamname:'Cowboys', abbr:'DAL'}, {teamname:'Redskins', abbr:'WAS'}, {teamname:'Giants', abbr:'NYG'}, {teamname:'Eagles', abbr:'PHI'},
 ]
 
 var connector = new builder.ChatConnector({
@@ -80,10 +80,18 @@ bot.dialog('/', [
             //send player to other dialog (playerName = results.response.entity)
         }
     },
-    function (session, results) { // "What Position does this player play?"
+    function (session, results) { // "What Position does this player play?" // ShowTeams
         positionChosen = results.response.entity;
+        
     },
 ]);
+
+function getCurrentTeamThumbnail(session, teamobj) {
+    var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.title(teamobj.teamname);
+    var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + teamobj.abbr + '/' + teamobj.abbr + '_logo-80x90.gif';
+    thumbnail.images([builder.CardImage.create(session, imageUrl)]);
+} 
 
 function getPlayerThumbnail(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
@@ -104,6 +112,7 @@ function getPlayerThumbnail(session, player) {
     thumbnail.tap(new builder.CardAction.openUrl(session, url));
     return thumbnail;
 };
+
 function getPlayerThumbnailWithButton(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
     thumbnail.data.score = player.score;
