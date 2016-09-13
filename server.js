@@ -48,9 +48,9 @@ bot.dialog('/', [
             });
         });
     },
-    function (session, results) {
+    function (session, results, next) {
         if (results.response.entity == 'Yes') {
-            builder.Prompts.choice(session, 'Which stats are you looking for?', ['Projections', 'Record']);
+            //send player to other dialog
         } else {
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
@@ -59,7 +59,11 @@ bot.dialog('/', [
         }
     },
     function (session, results) {
-        console.log(results.response)
+        if(results.response.entity == 'Player Not Listed'){
+            //loop through position, etc
+        } else {
+            //send player to other dialog (playerName = results.response.entity)
+        }
     },
 ]);
 
