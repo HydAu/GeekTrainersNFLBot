@@ -130,9 +130,5 @@ function sortByScore(thumbnails) {
             thumbnails[maxIndex] = temp;
         }
     }
-    console.log('---------------------')
-    for (var i = 0; i < thumbnails.length; i++) {
-        console.log(thumbnails[i].data.score);
-    }
     return thumbnails;
 }
