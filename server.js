@@ -43,7 +43,7 @@ bot.dialog('/', [
     function(session, results){
         if (results.response.entity == 'Yes'){
             //fix
-            builder.Prompts.text(session, 'Which stats are you looking for?', ['Projections', 'Record']);
+            builder.Prompts.choice(session, 'Which stats are you looking for?', ['Projections', 'Record']);
         } else {
 
         }
