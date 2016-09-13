@@ -9,8 +9,21 @@ var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
 });
+
 var playersReturnedFromSearch = [];
 var playerThumbnails = [];
+var positionChosen = null;
+var teams = [
+    'Chargers', 'Broncos', 'Raiders', 'Chiefs', 
+    'Jaguars', 'Titans', 'Texans', 'Colts', 
+    'Patriots', 'Jets', 'Bills', 'Dolphins',
+    'Steelers', 'Ravens', 'Bengals', 'Browns', 
+    'Panthers', 'Falcons', 'Saints', 'Buccaneers',
+    'Packers', 'Vikings', 'Bears', 'Lions', 
+    '49ers', 'Cardinals', 'Rams', 'Seahawks',
+    'Cowboys', 'Redskins', 'Giants', 'Eagles'
+]
+
 var connector = new builder.ChatConnector({
     // appId: process.env.MICROSOFT_APP_ID,
     // appPassword: process.env.MICROSOFT_APP_PASSWORD
@@ -27,7 +40,7 @@ bot.dialog('/', [
             builder.Prompts.text(session, 'What player are you looking for?');
         }
     },
-    function (session, results) {
+    function (session, results) { // After GetStats
         var playername = results.response;
         var path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
         path += querystring.escape(playername);
@@ -49,21 +62,26 @@ bot.dialog('/', [
         });
     },
     function (session, results, next) {
-        if (results.response.entity == 'Yes') {
+        if (results.response.entity === 'Yes') {
             //send player to other dialog
         } else {
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
             session.send(message);
-            builder.Prompts.choice(session, '', ['Player Not Listed']);
+            builder.Prompts.choice(session, '', ['Player Not Listed', 'Retype Name']);
         }
     },
-    function (session, results) {
-        if(results.response.entity == 'Player Not Listed'){
-            //loop through position, etc
+    function (session, results) { // Player not listed
+        if (results.response.entity === 'Player Not Listed') {
+            builder.Prompts.choice(session, 'What position does this player play?', ['QB', 'RB', 'WR', 'TE', 'K', 'DST']); // Unknown?
+        } else if (results.response.entity === 'Retype Name') {
+            // send back to beginning
         } else {
             //send player to other dialog (playerName = results.response.entity)
         }
+    },
+    function (session, results) { // "What Position does this player play?"
+        positionChosen = results.response.entity;
     },
 ]);
 
