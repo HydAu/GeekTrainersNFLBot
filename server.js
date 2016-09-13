@@ -14,14 +14,14 @@ var playersReturnedFromSearch = [];
 var playerThumbnails = [];
 var positionChosen = null;
 var teams = [
-    'Chargers', 'Broncos', 'Raiders', 'Chiefs', 
-    'Jaguars', 'Titans', 'Texans', 'Colts', 
-    'Patriots', 'Jets', 'Bills', 'Dolphins',
-    'Steelers', 'Ravens', 'Bengals', 'Browns', 
-    'Panthers', 'Falcons', 'Saints', 'Buccaneers',
-    'Packers', 'Vikings', 'Bears', 'Lions', 
-    '49ers', 'Cardinals', 'Rams', 'Seahawks',
-    'Cowboys', 'Redskins', 'Giants', 'Eagles'
+    'SD', 'DEN', 'OAK', 'KC', 
+    'JAX', 'TEN', 'HOU', 'IND', 
+    'NE', 'NYJ', 'BUF', 'MIA',
+    'PIT', 'BAL', 'CIN', 'CLE', 
+    'CAR', 'ATL', 'NO', 'TB',
+    'GB', 'MIN', 'CHI', 'DET', 
+    'SF', 'ARI', 'LA', 'SEA',
+    'DAL', 'WAS', 'NYG', 'PHI'
 ]
 
 var connector = new builder.ChatConnector({
