@@ -14,6 +14,7 @@ var playersReturnedFromSearch = [];
 var playerThumbnails = [];
 var teamThumbnails = [];
 var positionChosen = null;
+var teamChosen = null;
 var teams = [
     { teamname: 'San Diego Chargers', abbr: 'SD' },
     { teamname: 'Denver Broncos', abbr: 'DEN' },
@@ -112,25 +113,22 @@ bot.dialog('/', [
         positionChosen = results.response.entity;
         var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
         session.send(message);
+        builder.Prompts.text(session, 'Type your team name');
     },
     function (session, results) { // Get potential players from teamname/position
-        console.log('-----------------------------');
-        // session.send(results.response.entity);
-        // session.send(positionChosen);
+        console.log('---------------------------------------')
         console.log(results.response.entity);
-        console.log(positionChosen);
-        console.log('-----------------------------');
     }
 ]);
 
-function getCurrentTeamThumbnail(session, teamobj) {
+function getCurrentTeamThumbnail(session, team) {
     var thumbnail = new builder.ThumbnailCard(session);
-    thumbnail.title(teamobj.teamname);
-    var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + teamobj.abbr + '/' + teamobj.abbr + '_logo-80x90.gif';
+    thumbnail.title(team.teamname);
+    var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + team.abbr + '/' + team.abbr + '_logo-80x90.gif';
     thumbnail.images([builder.CardImage.create(session, imageUrl)])
-    thumbnail.buttons([
-        builder.CardAction.imBack(session, teamobj.teamname, 'Select')
-    ]);
+    // thumbnail.buttons([
+    //     builder.CardAction.imBack(session, team.teamname, 'Select')
+    // ]);
     return thumbnail;
 }
 
