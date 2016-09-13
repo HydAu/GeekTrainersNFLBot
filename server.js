@@ -27,7 +27,6 @@ bot.dialog('/', [
         }
     },
     function(session, results) {
-        session.send(results.response);
         var playername = results.response;
         var path = '/indexes/playername/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
         path += querystring.escape(playername);
@@ -37,9 +36,18 @@ bot.dialog('/', [
                 var thumbnail = getPlayerThumbnail(session, player);
                 var message = new builder.Message(session).attachments([thumbnail]);
                 session.send(message);
+                builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
             });
         });
-    }
+    },
+    function(session, results){
+        if (results.response.entity == 'Yes'){
+            //fix
+            builder.Prompts.text(session, 'Which stats are you looking for?', ['Projections', 'Record']);
+        } else {
+
+        }
+    },
 ]);
 
 function getPlayerThumbnail(session, player) {
