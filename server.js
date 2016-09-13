@@ -87,6 +87,7 @@ bot.dialog('/', [
                 var thumbnail = getPlayerThumbnail(session, player);
                 var message = new builder.Message(session).attachments([thumbnail]);
                 session.send(message);
+                playersReturnedFromSearch = [];
                 builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
             });
         });
@@ -98,6 +99,7 @@ bot.dialog('/', [
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
             session.send(message);
+            playerThumbnails = [];
             builder.Prompts.choice(session, '', ['Player Not Listed', 'Retype Name']);
         }
     },
@@ -127,6 +129,7 @@ bot.dialog('/', [
             playerTeamThumbnails = sortByScore(playerTeamThumbnails);
             var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
             session.send(message);
+            playerTeamThumbnails = [];
         });
     }
 ]);
@@ -136,9 +139,6 @@ function getCurrentTeamThumbnail(session, team) {
     thumbnail.title(team.teamname);
     var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + team.abbr + '/' + team.abbr + '_logo-80x90.gif';
     thumbnail.images([builder.CardImage.create(session, imageUrl)])
-    // thumbnail.buttons([
-    //     builder.CardAction.imBack(session, team.teamname, 'Select')
-    // ]);
     return thumbnail;
 }
 
@@ -197,10 +197,11 @@ function loadData(path, callback) {
     });
     request.end();
 }
+
 function sortByScore(thumbnails) {
     for (var i = 0; i < thumbnails.length; i++) {
-        var maximumScore = 0;
-        var maxIndex;
+        var maximumScore = thumbnails[i].data.score;
+        var maxIndex = i;
         for (var j = i; j < thumbnails.length; j++) {
             if (thumbnails[j].data.score > maximumScore) {
                 maximumScore = thumbnails[j].data.score;
