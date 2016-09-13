@@ -54,6 +54,7 @@ bot.dialog('/', [
         } else {
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
             session.send(message); 
+            builder.Prompts.choice(session, '', ['Player Not Listed']);
         }
     },
     function (session, results) {
