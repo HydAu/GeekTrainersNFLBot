@@ -33,10 +33,30 @@ bot.dialog('/', [
         path += querystring.escape(playername);
         loadData(path, function(players) {
             var displayName = players.value[0].displayName;
-            sql.getPlayerData(displayName);
+            sql.getPlayerData(displayName, function(player) {
+                var thumbnail = getPlayerThumbnail(session, player);
+                var message = new builder.Message(session).attachments([thumbnail]);
+                session.send(message);
+            });
         });
     }
 ]);
+
+function getPlayerThumbnail(session, player) {
+    var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.title(player.displayName);
+    // thumbnail.images([builder.CardImage.create(session, player.avatar_url)]);
+
+    thumbnail.subtitle(player.position + ', ' + player.teamFullName);
+
+    var text = '';
+    if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
+    if (player.jerseyNumber) text += 'Jersey: ' + player.jerseyNumber + ' \n';
+    thumbnail.text(text);
+
+    // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
+    return thumbnail;
+};
 
 function loadData(path, callback) {
     var options = {

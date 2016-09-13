@@ -11,13 +11,18 @@ var wrapper = function () {
         }
     });
 
-    self.getPlayerData = function (player) {
-        console.log(self.sql)
+    self.getPlayerData = function (player, callback) {
         self.sql.execute({
-            query: "SELECT * from TeamPlayer where displayName = '" + player + "'"
+            query: "SELECT TOP 1 * from TeamPlayer where displayName = @player ORDER BY season DESC",
+            params: {
+                player: {
+                    type: self.sql.NVARCHAR,
+                    val: player,
+                }
+            }
         }).then(function (res) {
-            results = res;
-            console.log(results);
+            console.log(res[0]);
+            callback(res[0]);
         }, function (err) {
             console.log("Something bad happened:", err);
         });
