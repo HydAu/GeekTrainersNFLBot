@@ -35,7 +35,7 @@ bot.dialog('/', [
             playersReturnedFromSearch = players.value;
             for (var i = 0; i < 5; i++) {
                 sql.getPlayerData(playersReturnedFromSearch[i].displayName, function (player) {
-                    var thumbnail = getPlayerThumbnail(session, player);
+                    var thumbnail = getPlayerThumbnailWithButton(session, player);
                     playerThumbnails.push(thumbnail);
                 });
             }
@@ -56,6 +56,9 @@ bot.dialog('/', [
             session.send(message); 
         }
     },
+    function (session, results) {
+        console.log(results.response)
+    },
 ]);
 
 function getPlayerThumbnail(session, player) {
@@ -66,6 +69,23 @@ function getPlayerThumbnail(session, player) {
 
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
 
+    var text = '';
+    if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
+    if (player.jerseyNumber) text += 'Jersey: ' + player.jerseyNumber + ' \n';
+    thumbnail.text(text);
+
+    // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
+    return thumbnail;
+};
+function getPlayerThumbnailWithButton(session, player) {
+    var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.title(player.displayName);
+    var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
+    thumbnail.images([builder.CardImage.create(session, imageUrl)]);
+    thumbnail.subtitle(player.position + ', ' + player.teamFullName);
+    thumbnail.buttons([
+        builder.CardAction.imBack(session,player.displayName,player.displayName)
+    ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
     if (player.jerseyNumber) text += 'Jersey: ' + player.jerseyNumber + ' \n';
