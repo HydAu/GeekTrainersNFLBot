@@ -126,12 +126,11 @@ bot.dialog('/', [
 function getCurrentTeamThumbnail(session, teamobj) {
     var thumbnail = new builder.ThumbnailCard(session);
     thumbnail.title(teamobj.teamname);
+    var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + teamobj.abbr + '/' + teamobj.abbr + '_logo-80x90.gif';
+    thumbnail.images([builder.CardImage.create(session, imageUrl)])
     thumbnail.buttons([
         builder.CardAction.imBack(session, teamobj.teamname, 'Select')
     ]);
-    
-    var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + teamobj.abbr + '/' + teamobj.abbr + '_logo-80x90.gif';
-    thumbnail.images([builder.CardImage.create(session, imageUrl)])
     return thumbnail;
 }
 
