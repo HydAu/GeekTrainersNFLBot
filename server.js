@@ -45,7 +45,8 @@ bot.dialog('/', [
 function getPlayerThumbnail(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
     thumbnail.title(player.displayName);
-    // thumbnail.images([builder.CardImage.create(session, player.avatar_url)]);
+    var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
+    thumbnail.images([builder.CardImage.create(session, imageUrl)]);
 
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
 
