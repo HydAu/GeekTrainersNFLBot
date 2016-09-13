@@ -199,6 +199,7 @@ function loadData(path, callback) {
 }
 
 function sortByScore(thumbnails) {
+    thumbnails = thumbnails.slice(1);
     for (var i = 0; i < thumbnails.length; i++) {
         var maximumScore = thumbnails[i].data.score;
         var maxIndex = i;
