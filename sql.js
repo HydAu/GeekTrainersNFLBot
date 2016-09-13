@@ -26,6 +26,26 @@ var wrapper = function () {
             console.log("Something bad happened:", err);
         });
     };
+
+    self.getPlayerList = function(position, team, callback) {
+        self.sql.execute({
+            query: "SELECT * FROM Player WHERE position = @position AND teamfullname = @team order by score desc",
+            params: {
+                position: {
+                    type: self.sql.NVARCHAR,
+                    val: position
+                },
+                team: {
+                    type: self.sql.NVARCHAR,
+                    val: team
+                }
+            }
+        }).then(function (results) {
+            callback(results);
+        }, function (err) {
+            console.log("Something bad happened:", err);
+        });;
+    }
 };
 
 module.exports = new wrapper();
