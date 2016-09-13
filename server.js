@@ -29,7 +29,7 @@ bot.dialog('/', [
     },
     function (session, results) {
         var playername = results.response;
-        var path = '/indexes/playername/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
+        var path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
         path += querystring.escape(playername);
         loadData(path, function (players) {
             playersReturnedFromSearch = players.value;
@@ -81,6 +81,9 @@ function getPlayerThumbnail(session, player) {
     thumbnail.text(text);
 
     // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
+    var urlPlayer = player.displayName.replace(' ', '').replace('-', '').toLowerCase();
+    var url = 'http://www.nfl.com/player/' + urlPlayer + '/' + player.nflId + '/profile';
+    thumbnail.tap(new builder.CardAction.openUrl(session, url));
     return thumbnail;
 };
 function getPlayerThumbnailWithButton(session, player) {
