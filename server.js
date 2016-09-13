@@ -13,6 +13,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 var playersReturnedFromSearch = [];
 var playerThumbnails = [];
 var teamThumbnails = [];
+var playerTeamThumbnails = [];
 var positionChosen = null;
 var teamChosen = null;
 var teams = [
@@ -116,11 +117,18 @@ bot.dialog('/', [
         builder.Prompts.text(session, 'Type your team name');
     },
     function (session, results) { // Get potential players from teamname/position
-        console.log('---------------------------------------')
-        console.log(results.response);
-        console.log(positionChosen);
-        console.log('---------------------------------------')
-        
+        teamChosen = results.response;
+        // positionChosen
+        sql.getPlayerList(positionChosen, teamChosen, function(response) {
+            for (var i = 0; i < response.length; i++) {
+                var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
+                playerTeamThumbnails.push(thumbnail);
+            }
+        });
+
+        playerTeamThumbnails = sortByScore(playerTeamThumbnails);
+        var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+        session.send(message);
     }
 ]);
 
