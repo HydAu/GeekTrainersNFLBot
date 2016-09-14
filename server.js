@@ -101,19 +101,20 @@ bot.dialog('/player', [
     (session, results, next) => {
         if (results.response.entity.toLowerCase() === 'yes') {
             session.privateConversationData.currentPlayer = session.privateConversationData.players[0];
-            session.replaceDialog('/stats');
+            session.beginDialog('/stats');
         } else if (session.privateConversationData.players.length > 1) {
             const players = session.privateConversationData.players;
             let thumbnails = [];
             for (let index = 1; index < (players.length < 6 ? players.length : 5); index++) {
                 thumbnails.push(getPlayerThumbnailWithButton(session, players[index]));
             }
-            session.send(new builder
+            let message = new builder
                 .Message(session)
                 .attachments(thumbnails)
-                .attachmentLayout('carousel')
-            );
-            builder.Prompts.choice(session, '', ['Player Not Listed']);
+                .attachmentLayout('carousel');
+            players.pop();
+            builder.Prompts.choice(session, message, players.map(i => i.nflId))
+            // builder.Prompts.choice(session, '', ['Player Not Listed']);
         } else {
             next({ response: { entity: 'Player Not Listed' } });
         }
@@ -123,11 +124,22 @@ bot.dialog('/player', [
             session.send('So sorry. Do not know that one.');
             session.replaceDialog('/', { message: { text: response } });
         } else {
-            //send player to other dialog (playerName = results.response.entity)
+            //need results.response to be the nfl id
+            let nflID = results.response.entity;
+            var player = findPlayer(session, nflID);
+            session.privateConversationData.currentPlayer = player;
+            session.beginDialog('/stats');
         }
     }
 ]);
-
+function findPlayer(session, integer){
+    let players = session.privateConversationData.players;
+    for(var i = 0; i<players.length; i++){
+        if(players[i].nflId == integer){
+            return players[i];
+        }
+    }
+}
 
 
 bot.dialog('/stats', [
@@ -180,7 +192,6 @@ function getCurrentTeamThumbnail(session, team) {
 function getPlayerThumbnail(session, player) {
     try {
         var thumbnail = new builder.ThumbnailCard(session);
-        thumbnail.data.id = player.id;
         thumbnail.title(player.displayName);
         var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
         thumbnail.images([builder.CardImage.create(session, imageUrl)]);
@@ -210,7 +221,7 @@ function getPlayerThumbnailWithButton(session, player) {
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
     thumbnail.buttons([
-        builder.CardAction.imBack(session, player.id, 'Select')
+        new builder.CardAction.postBack(session, player.nflId, 'Select')
     ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
