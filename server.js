@@ -143,6 +143,7 @@ function getCurrentTeamThumbnail(session, team) {
 }
 
 function getPlayerThumbnail(session, player) {
+    thumbnail.data.id = player.id;
     var thumbnail = new builder.ThumbnailCard(session);
     thumbnail.title(player.displayName);
     var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
@@ -164,6 +165,7 @@ function getPlayerThumbnail(session, player) {
 
 function getPlayerThumbnailWithButton(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.data.id = player.id;
     thumbnail.data.score = player.score;
     thumbnail.title(player.displayName);
     var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
