@@ -220,3 +220,25 @@ function sortByScore(thumbnails) {
     }
     return thumbnails;
 }
+bot.dialog('/Position', [
+    function (session, results) { // "What Position does this player play?" // ShowTeams
+        positionChosen = results.response.entity;
+        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
+        session.send(message);
+        builder.Prompts.text(session, 'Type your team name');
+    },
+    function (session, results) { // Get potential players from teamname/position
+        teamChosen = results.response;
+        // positionChosen
+        sql.getPlayerList(positionChosen, teamChosen, function (response) {
+            for (var i = 0; i < response.length; i++) {
+                var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
+                playerTeamThumbnails.push(thumbnail);
+            }
+            playerTeamThumbnails = sortByScore(playerTeamThumbnails);
+            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+            session.send(message);
+            playerTeamThumbnails = [];
+        });
+    }
+]);
