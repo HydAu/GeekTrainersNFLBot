@@ -82,15 +82,14 @@ bot.dialog('/', [
                 path += querystring.escape(playername);
                 loadData(path, function (result) {
                     let players = result.value;
-                    // for (var i = 0; i < 5; i++) {
-                    //     sql.getPlayerData(players[i].displayName, function (player) {
-                    //         var thumbnail = getPlayerThumbnailWithButton(session, player);
-                    //         playerThumbnails.push(thumbnail);
-                    //     });
-                    // }
+                    for (var i = 0; i < 5; i++) {
+                        sql.getPlayerData(players[i].displayName, function (player) {
+                            var thumbnail = getPlayerThumbnailWithButton(session, player);
+                            playerThumbnails.push(thumbnail);
+                        });
+                    }
                     let firstPlayer = players[0];
                     var thumbnail = getPlayerThumbnail(session, firstPlayer);
-                    //var topChoiceID = player.id;
                     var message = new builder.Message(session).attachments([thumbnail]);
                     session.send(message);
                     builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
@@ -101,8 +100,6 @@ bot.dialog('/', [
     function (session, results, next) {
         if (results.response.entity === 'Yes') {
             session.beginDialog('/stats')
-            //send player to other dialog
-            //do something with topChoiceID
         } else {
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
