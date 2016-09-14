@@ -8,6 +8,7 @@ var sessionHelper = function () {
     }
 
     self.setSession = function (session, key, value, private) {
+        
         if (private) {
             session.privateConversationData.key = value;
         } else {
