@@ -1,5 +1,5 @@
 var sessionHelper = function () {
-    this.setSession = function (session, key, value, private = false) {
+    this.setSession = function (session, key, value, private) {
         if (private) {
             session.privateConversationData.key = value;
         } else {

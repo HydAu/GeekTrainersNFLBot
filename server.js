@@ -4,7 +4,7 @@ var dialog = require('./dialog.js');
 var https = require('https');
 var querystring = require('querystring');
 var sql = require('./sql');
-
+var sessionHelper = require('./util.js')
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
@@ -71,8 +71,7 @@ bot.dialog('/', [
     },
     function (session, results) { // After GetStats
         if (results.response === 'QB' || results.response === 'RB' || results.response === 'WR' || results.response === 'TE' || results.response === 'K' || results.response === 'DEF') {
-            console.log('Got a position')
-            session.conversationData.position = results.response;
+            sessionHelper.setSession(session, 'conversationData', results.response)
             session.beginDialog('/Position');
         } else {
             var playername = results.response;
