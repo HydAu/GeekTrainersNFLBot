@@ -99,6 +99,7 @@ bot.dialog('/', [
     },
     function (session, results, next) {
         if (results.response.entity === 'Yes') {
+            session.beginDialog('/stats')
             //send player to other dialog
             //do something with topChoiceID
         } else {
@@ -142,6 +143,19 @@ bot.dialog('/', [
         });
     }
 ]);
+
+bot.dialog('/stats', [
+    function(session, results) {
+        sql.getPlayerStats(2506363, function (response) {
+            // send stat based on player Type
+            var stats = JSON.parse(response[0].stat);
+            var statThumbnail = getPlayerStatsThumbnail(session, stats);
+            var message = new builder.Message(session).attachments([statThumbnail]);
+            session.send(message);
+            
+        });
+    }
+])
 
 function getCurrentTeamThumbnail(session, team) {
     var thumbnail = new builder.ThumbnailCard(session);
@@ -227,6 +241,21 @@ function sortByScore(thumbnails) {
     }
     return thumbnails;
 }
+
+
+function getPlayerStatsThumbnail(session, player) {
+    var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.title(player.displayName)
+    thumbnail.subtitle(player.season + ' | ' + player.week);
+    var text = '';
+    if (player.passing) text += 'Passing attempts/completions' + player.passing.attempts + '/'+ player.passing.completions + ' \n';
+    text += 'Yards: ' + player.passing.yards + " Touchdowns: " + player.passing.touchdowns + '\n';
+    thumbnail.text(text);
+
+    return thumbnail;
+};
+
+
 bot.dialog('/Position', [
     function (session, results) { // "What Position does this player play?" // ShowTeams
         positionChosen = session.conversationData.position;

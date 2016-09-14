@@ -10,6 +10,23 @@ var wrapper = function () {
             encrypt: true
         }
     });
+    self.getPlayerStats = function (nflId, callback) {
+        console.log('--------', nflId);
+        self.sql.execute({
+            query: "SELECT p.position, p.displayName, s.stat, s.week FROM player AS p JOIN stats AS s ON (p.nflId = s.nflId) WHERE p.nflId = @nflId",
+         
+            params: {
+                nflId: {
+                      type: self.sql.Int,
+                      val: nflId
+                } 
+            }
+        }).then(function (res) {
+            callback(res);
+        }, function (err) {
+            console.log("Error getting player Stats: ", err);
+        });
+    }
 
     self.getPlayerData = function (player, callback) {
         self.sql.execute({
