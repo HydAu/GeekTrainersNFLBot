@@ -100,6 +100,9 @@ bot.dialog('/', [
         } else {
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
+            // session.send(message); 
+            // builder.Prompts.choice(session, '', ['Player Not Listed']);
+            builder.Prompts.choice(session, message, 'Chose player');
             session.send(message);
             playerThumbnails = [];
             builder.Prompts.choice(session, '', ['Player Not Listed', 'Retype Name']);
