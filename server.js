@@ -148,9 +148,11 @@ bot.dialog('/', [
 bot.dialog('/stats', [
     function(session, results) {
         sql.getPlayerStats(2506363, function (response) {
+            var params = {}
+            params.otherstats = response[0];
             // send stat based on player Type
-            var stats = JSON.parse(response[0].stat);
-            var statThumbnail = getPlayerStatsThumbnail(session, stats);
+            params.stats = JSON.parse(response[0].stat);
+            var statThumbnail = getPlayerStatsThumbnail(session, params);
             var message = new builder.Message(session).attachments([statThumbnail]);
             session.send(message);
             
@@ -167,8 +169,8 @@ function getCurrentTeamThumbnail(session, team) {
 }
 
 function getPlayerThumbnail(session, player) {
-    thumbnail.data.id = player.id;
     var thumbnail = new builder.ThumbnailCard(session);
+    thumbnail.data.id = player.id;
     thumbnail.title(player.displayName);
     var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
@@ -246,11 +248,22 @@ function sortByScore(thumbnails) {
 
 function getPlayerStatsThumbnail(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
-    thumbnail.title(player.displayName)
-    thumbnail.subtitle(player.season + ' | ' + player.week);
     var text = '';
-    if (player.passing) text += 'Passing attempts/completions' + player.passing.attempts + '/'+ player.passing.completions + ' \n';
-    text += 'Yards: ' + player.passing.yards + " Touchdowns: " + player.passing.touchdowns + '\n';
+    console.log(player.otherstats.position);
+    thumbnail.title(player.otherstats.displayName)
+    thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
+    if (player.otherstats.position == 'QB') {
+            text += `Passing: ${player.stats.passing.completions}/${player.stats.passing.attempts},\r\n`;
+            text += `Yards: ${player.stats.passing.yards},\nTouchdowns: ${player.stats.passing.touchdowns}\r\nInterceptions: ${player.stats.passing.interceptions},\r\n `;
+    }
+    if (player.otherstats.position == 'RB' || 'TE' || 'WR'){
+        text += ` Rushing: Carries: ${player.stats.rushing.carries},\n  Yards: ${player.stats.rushing.yards},\n  Touchdowns: ${player.stats.rushing.touchdowns},\n Fumbles Lost: ${player.stats.rushing.fumblesLost}`;
+    }
+    if (player.otherstats.position == 'RB' || 'TE' || 'WR') {
+        text += `Receiving: Catches: ${player.stats.receiving.catches}, Yards: ${player.stats.receiving.yards}\n Touchdowns: ${player.stats.receiving.touchdowns}\n Fumbles Lost: ${player.stats.receiving.fumblesLost}`
+    }
+    
+
     thumbnail.text(text);
 
     return thumbnail;

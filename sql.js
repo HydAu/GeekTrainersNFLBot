@@ -13,7 +13,7 @@ var wrapper = function () {
     self.getPlayerStats = function (nflId, callback) {
         console.log('--------', nflId);
         self.sql.execute({
-            query: "SELECT p.position, p.displayName, s.stat, s.week FROM player AS p JOIN stats AS s ON (p.nflId = s.nflId) WHERE p.nflId = @nflId",
+            query: "SELECT p.position, p.displayName, s.stat, s.week, s.year FROM player AS p JOIN stats AS s ON (p.nflId = s.nflId) WHERE p.nflId = @nflId",
          
             params: {
                 nflId: {
