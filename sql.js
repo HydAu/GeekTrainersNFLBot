@@ -13,7 +13,7 @@ var wrapper = function () {
 
     self.getPlayerData = function (player, callback) {
         self.sql.execute({
-            query: "SELECT TOP 1 * from player where displayName = @player",
+            query: "SELECT TOP 1 * from player where displayName = @player order by score desc",
             params: {
                 player: {
                     type: self.sql.NVARCHAR,
@@ -21,12 +21,31 @@ var wrapper = function () {
                 }
             }
         }).then(function (res) {
-            console.log(res[0]);
             callback(res[0]);
         }, function (err) {
             console.log("Something bad happened:", err);
         });
     };
+
+    self.getPlayerList = function(position, team, callback) {
+        self.sql.execute({
+            query: "SELECT * FROM Player WHERE position = @position AND teamfullname = @team order by score desc",
+            params: {
+                position: {
+                    type: self.sql.NVARCHAR,
+                    val: position
+                },
+                team: {
+                    type: self.sql.NVARCHAR,
+                    val: team
+                }
+            }
+        }).then(function (results) {
+            callback(results);
+        }, function (err) {
+            console.log("Something bad happened:", err);
+        });;
+    }
 };
 
 module.exports = new wrapper();
