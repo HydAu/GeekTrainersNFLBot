@@ -165,14 +165,13 @@ function getPlayerThumbnail(session, player) {
 
 function getPlayerThumbnailWithButton(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
-    thumbnail.data.id = player.id;
     thumbnail.data.score = player.score;
     thumbnail.title(player.displayName);
     var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
     thumbnail.buttons([
-        builder.CardAction.imBack(session, player.displayName, 'Select')
+        builder.CardAction.imBack(session, player.id, 'Select')
     ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
