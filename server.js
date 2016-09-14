@@ -53,8 +53,9 @@ bot.dialog('/', [
             builder.Prompts.choice(session, 'Which stats are you looking for?', ['Projections', 'Record']);
         } else {
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
-            session.send(message); 
-            builder.Prompts.choice(session, '', ['Player Not Listed']);
+            // session.send(message); 
+            // builder.Prompts.choice(session, '', ['Player Not Listed']);
+            builder.Prompts.choice(session, message, 'Chose player');
         }
     },
     function (session, results) {
@@ -88,7 +89,7 @@ function getPlayerThumbnailWithButton(session, player) {
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
     thumbnail.buttons([
-        builder.CardAction.imBack(session,player.displayName, 'Select')
+        builder.CardAction.imBack(session, player.displayName, 'Select')
     ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
