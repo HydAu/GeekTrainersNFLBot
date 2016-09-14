@@ -17,7 +17,7 @@ var wrapper = function () {
          
             params: {
                 nflId: {
-                      type: self.sql.Int,
+                      type: self.sql.NVARCHAR,
                       val: nflId
                 } 
             }
