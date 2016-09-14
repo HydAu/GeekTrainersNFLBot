@@ -7,11 +7,17 @@ var sessionHelper = function () {
         return false;
     }
     self.setSession = function (session, key, value, private) {
-        
         if (private) {
             session.privateConversationData.key = value;
         } else {
             session.conversationData.key = value;
+        }
+    }
+    self.getSession = function (session, key, private) {
+        if (private) {
+            return session.privateConversationData.key;
+        } else {
+            return session.conversationData.key;
         }
     }
 }
