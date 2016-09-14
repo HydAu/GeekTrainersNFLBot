@@ -9,7 +9,7 @@ var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
 });
-
+var topChoiceID = null;
 var playersReturnedFromSearch = [];
 var playerThumbnails = [];
 var teamThumbnails = [];
@@ -85,6 +85,7 @@ bot.dialog('/', [
             var displayName = players.value[0].displayName;
             sql.getPlayerData(displayName, function (player) {
                 var thumbnail = getPlayerThumbnail(session, player);
+                var topChoiceID = player.id;
                 var message = new builder.Message(session).attachments([thumbnail]);
                 session.send(message);
                 playersReturnedFromSearch = [];
@@ -95,6 +96,7 @@ bot.dialog('/', [
     function (session, results, next) {
         if (results.response.entity === 'Yes') {
             //send player to other dialog
+            //do something with topChoiceID
         } else {
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
