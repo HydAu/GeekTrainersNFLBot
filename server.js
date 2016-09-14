@@ -9,7 +9,7 @@ var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
 });
-
+var topChoiceID = null;
 var playersReturnedFromSearch = [];
 var playerThumbnails = [];
 var teamThumbnails = [];
@@ -60,45 +60,55 @@ server.post('/api/messages', connector.listen());
 bot.dialog('/', [
     function (session) {
         builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
-
     },
     function (session, results) {
         for (var i = 0; i < teams.length; i++) {
             teamThumbnails.push(getCurrentTeamThumbnail(session, teams[i]));
         }
         if (results.response.entity === 'Get Stats') {
-            builder.Prompts.text(session, 'What player are you looking for?');
+            builder.Prompts.text(session, 'Enter a Player Name or Position');
         }
     },
     function (session, results) { // After GetStats
-        var playername = results.response;
-        var path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
-        path += querystring.escape(playername);
-        loadData(path, function (players) {
-            playersReturnedFromSearch = players.value;
-            for (var i = 0; i < 5; i++) {
-                sql.getPlayerData(playersReturnedFromSearch[i].displayName, function (player) {
-                    var thumbnail = getPlayerThumbnailWithButton(session, player);
-                    playerThumbnails.push(thumbnail);
+        if (results.response === 'QB' || results.response === 'RB' || results.response === 'WR' || results.response === 'TE' || results.response === 'K' || results.response === 'DEF') {
+            console.log('Got a position')
+            session.conversationData.position = results.response;
+            session.beginDialog('/Position');
+        } else {
+            var playername = results.response;
+            var path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
+            path += querystring.escape(playername);
+            loadData(path, function (players) {
+                playersReturnedFromSearch = players.value;
+                for (var i = 0; i < 5; i++) {
+                    sql.getPlayerData(playersReturnedFromSearch[i].displayName, function (player) {
+                        var thumbnail = getPlayerThumbnailWithButton(session, player);
+                        playerThumbnails.push(thumbnail);
+                    });
+                }
+                var displayName = players.value[0].displayName;
+                sql.getPlayerData(displayName, function (player) {
+                    var thumbnail = getPlayerThumbnail(session, player);
+                    var topChoiceID = player.id;
+                    var message = new builder.Message(session).attachments([thumbnail]);
+                    session.send(message);
+                    playersReturnedFromSearch = [];
+                    builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
                 });
-            }
-            var displayName = players.value[0].displayName;
-            sql.getPlayerData(displayName, function (player) {
-                var thumbnail = getPlayerThumbnail(session, player);
-                var message = new builder.Message(session).attachments([thumbnail]);
-                session.send(message);
-                playersReturnedFromSearch = [];
-                builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
             });
-        });
+        }
     },
     function (session, results, next) {
         if (results.response.entity === 'Yes') {
             session.beginDialog('/stats')
             //send player to other dialog
+            //do something with topChoiceID
         } else {
             playerThumbnails = sortByScore(playerThumbnails);
             var message = new builder.Message(session).attachments(playerThumbnails).attachmentLayout('carousel');
+            // session.send(message); 
+            // builder.Prompts.choice(session, '', ['Player Not Listed']);
+            builder.Prompts.choice(session, message, 'Chose player');
             session.send(message);
             playerThumbnails = [];
             builder.Prompts.choice(session, '', ['Player Not Listed', 'Retype Name']);
@@ -157,6 +167,7 @@ function getCurrentTeamThumbnail(session, team) {
 }
 
 function getPlayerThumbnail(session, player) {
+    thumbnail.data.id = player.id;
     var thumbnail = new builder.ThumbnailCard(session);
     thumbnail.title(player.displayName);
     var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
@@ -184,7 +195,7 @@ function getPlayerThumbnailWithButton(session, player) {
     thumbnail.images([builder.CardImage.create(session, imageUrl)]);
     thumbnail.subtitle(player.position + ', ' + player.teamFullName);
     thumbnail.buttons([
-        builder.CardAction.imBack(session, player.displayName, 'Select')
+        builder.CardAction.imBack(session, player.id, 'Select')
     ]);
     var text = '';
     if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
@@ -232,9 +243,9 @@ function sortByScore(thumbnails) {
     return thumbnails;
 }
 
+
 function getPlayerStatsThumbnail(session, player) {
     var thumbnail = new builder.ThumbnailCard(session);
-    console.log(player);
     thumbnail.title(player.displayName)
     thumbnail.subtitle(player.season + ' | ' + player.week);
     var text = '';
@@ -246,4 +257,25 @@ function getPlayerStatsThumbnail(session, player) {
 };
 
 
-
+bot.dialog('/Position', [
+    function (session, results) { // "What Position does this player play?" // ShowTeams
+        positionChosen = session.conversationData.position;
+        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
+        session.send(message);
+        builder.Prompts.text(session, 'Type your team name');
+    },
+    function (session, results) { // Get potential players from teamname/position
+        teamChosen = results.response;
+        // positionChosen
+        sql.getPlayerList(positionChosen, teamChosen, function (response) {
+            for (var i = 0; i < response.length; i++) {
+                var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
+                playerTeamThumbnails.push(thumbnail);
+            }
+            playerTeamThumbnails = sortByScore(playerTeamThumbnails);
+            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+            session.send(message);
+            playerTeamThumbnails = [];
+        });
+    }
+]);
