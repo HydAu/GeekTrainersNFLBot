@@ -4,7 +4,7 @@ var dialog = require('./dialog.js');
 var https = require('https');
 var querystring = require('querystring');
 var sql = require('./sql');
-var sessionHelper = require('./util.js')
+var sessionHelper = require('./sessionHelper.js')
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');

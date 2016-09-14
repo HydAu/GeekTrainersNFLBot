@@ -6,7 +6,6 @@ var sessionHelper = function () {
         }
         return false;
     }
-
     self.setSession = function (session, key, value, private) {
         
         if (private) {
@@ -17,4 +16,4 @@ var sessionHelper = function () {
     }
 }
 
-module.exports = sessionHelper();
+module.exports = new sessionHelper();
