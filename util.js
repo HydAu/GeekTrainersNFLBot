@@ -7,3 +7,5 @@ var sessionHelper = function () {
         }
     }
 }
+
+module.exports = sessionHelper();
