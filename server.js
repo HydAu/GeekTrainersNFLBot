@@ -147,6 +147,7 @@ bot.dialog('/', [
 
 bot.dialog('/stats', [
     function(session, results) {
+        console.log(session.userData);
         sql.getPlayerStats(2506363, function (response) {
             var params = {}
             params.otherstats = response[0];
@@ -253,17 +254,26 @@ function getPlayerStatsThumbnail(session, player) {
     thumbnail.title(player.otherstats.displayName)
     thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
     if (player.otherstats.position == 'QB') {
-            text += `Passing: ${player.stats.passing.completions}/${player.stats.passing.attempts},\r\n`;
-            text += `Yards: ${player.stats.passing.yards},\nTouchdowns: ${player.stats.passing.touchdowns}\r\nInterceptions: ${player.stats.passing.interceptions},\r\n `;
+            text += `Passing: ${player.stats.passing.completions}/${player.stats.passing.attempts},
+            Yards: ${player.stats.passing.yards}\n
+            Touchdowns: ${player.stats.passing.touchdowns}\n
+            Interceptions: ${player.stats.passing.interceptions}\n `;
     }
-    if (player.otherstats.position == 'RB' || 'TE' || 'WR'){
-        text += ` Rushing: Carries: ${player.stats.rushing.carries},\n  Yards: ${player.stats.rushing.yards},\n  Touchdowns: ${player.stats.rushing.touchdowns},\n Fumbles Lost: ${player.stats.rushing.fumblesLost}`;
+    if (player.otherstats.position ==   'QB' | 'TE' | 'WR' |'RB' ){
+        text += `
+                Carries: ${player.stats.rushing.carries},
+                Yards: ${player.stats.rushing.yards},
+                Touchdowns: ${player.stats.rushing.touchdowns},
+                Fumbles Lost: ${player.stats.rushing.fumblesLost}`;
     }
-    if (player.otherstats.position == 'RB' || 'TE' || 'WR') {
-        text += `Receiving: Catches: ${player.stats.receiving.catches}, Yards: ${player.stats.receiving.yards}\n Touchdowns: ${player.stats.receiving.touchdowns}\n Fumbles Lost: ${player.stats.receiving.fumblesLost}`
+    if (player.otherstats.position == 'RB' | 'TE' | 'WR') {
+        text += `
+                 Catches: ${player.stats.receiving.catches},
+                  Yards: ${player.stats.receiving.yards},
+                  Touchdowns: ${player.stats.receiving.touchdowns}, 
+                  Fumbles Lost: ${player.stats.receiving.fumblesLost}`
     }
     
-
     thumbnail.text(text);
 
     return thumbnail;
