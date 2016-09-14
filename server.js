@@ -70,9 +70,9 @@ bot.dialog('/', [
         }
     },
     function (session, results) { // After GetStats
-        if (results.response === 'QB' || results.response === 'RB' || results.response === 'WR' || results.response === 'TE' || results.response === 'K' || results.response === 'DEF') {
+        if (isPosition(results.response)) {
             sessionHelper.setSession(session, 'conversationData', results.response)
-            session.beginDialog('/Position');
+            session.beginDialog('/position');
         } else {
             var playername = results.response;
             var path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
@@ -156,6 +156,29 @@ bot.dialog('/stats', [
         });
     }
 ])
+
+bot.dialog('/position', [
+    function (session, results) { // "What Position does this player play?" // ShowTeams
+        positionChosen = session.conversationData.position;
+        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
+        session.send(message);
+        builder.Prompts.text(session, 'Type your team name');
+    },
+    function (session, results) { // Get potential players from teamname/position
+        teamChosen = results.response;
+        // positionChosen
+        sql.getPlayerList(positionChosen, teamChosen, function (response) {
+            for (var i = 0; i < response.length; i++) {
+                var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
+                playerTeamThumbnails.push(thumbnail);
+            }
+            playerTeamThumbnails = sortByScore(playerTeamThumbnails);
+            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+            session.send(message);
+            playerTeamThumbnails = [];
+        });
+    }
+]);
 
 function getCurrentTeamThumbnail(session, team) {
     var thumbnail = new builder.ThumbnailCard(session);
@@ -256,25 +279,6 @@ function getPlayerStatsThumbnail(session, player) {
 };
 
 
-bot.dialog('/Position', [
-    function (session, results) { // "What Position does this player play?" // ShowTeams
-        positionChosen = session.conversationData.position;
-        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
-        session.send(message);
-        builder.Prompts.text(session, 'Type your team name');
-    },
-    function (session, results) { // Get potential players from teamname/position
-        teamChosen = results.response;
-        // positionChosen
-        sql.getPlayerList(positionChosen, teamChosen, function (response) {
-            for (var i = 0; i < response.length; i++) {
-                var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
-                playerTeamThumbnails.push(thumbnail);
-            }
-            playerTeamThumbnails = sortByScore(playerTeamThumbnails);
-            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
-            session.send(message);
-            playerTeamThumbnails = [];
-        });
-    }
-]);
+function isPosition(text) {
+
+}
