@@ -6,13 +6,6 @@ var https = require('https');
 var querystring = require('querystring');
 var sql = require('./sql');
 var sessionHelper = require('./sessionHelper.js')
-var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 3978, function () {
-    console.log('listening');
-});
-var topChoiceID = null;
-var playersReturnedFromSearch = [];
-var playerThumbnails = [];
 var teamThumbnails = [];
 var playerTeamThumbnails = [];
 var positionChosen = null;
@@ -52,6 +45,11 @@ var teams = [
     { teamname: 'Philadelphia Eagles', abbr: 'PHI' },
 ]
 
+var server = restify.createServer();
+server.listen(process.env.port || process.env.PORT || 3978, function () {
+    console.log('listening');
+});
+
 var connector = new builder.ChatConnector({
     // appId: process.env.MICROSOFT_APP_ID,
     // appPassword: process.env.MICROSOFT_APP_PASSWORD
@@ -60,9 +58,12 @@ var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
 let dialog = new builder.IntentDialog()
-    .matches(/^get stats$/u, [
+    .onDefault((session, args, next) => {
+        builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
+        next(); // end the dialog
+    })
+    .matches(/^get ?stats$/u, [
         (session, results) => {
-            console.log('here');
             builder.Prompts.text(session, 'Enter a Player Name or Position');
         },
         (session, results, next) => {
@@ -77,10 +78,7 @@ let dialog = new builder.IntentDialog()
             });
         }
     ])
-    .onDefault((session, args, next) => {
-        builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
-        next();
-    });
+    ;
 
 bot.dialog('/', dialog);
 
@@ -90,8 +88,7 @@ bot.dialog('/player', [
         var path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
         path += querystring.escape(playerName);
         loadData(path, function (result) {
-            let players = result.value;
-            session.userData.players = players;
+            let players = session.userData.players = result.value;
             var thumbnail = getPlayerThumbnail(session, players[0]);
             var message = new builder.Message(session).attachments([thumbnail]);
             session.send(message);
@@ -106,12 +103,11 @@ bot.dialog('/player', [
             if (session.userData.players.length > 1) {
                 let players = session.userData.players;
                 let thumbnails = [];
-                for(let index = 1; index < (players.length < 6 ? players.length : 5); index++) {
+                for (let index = 1; index < (players.length < 6 ? players.length : 5); index++) {
                     thumbnails.push(getPlayerThumbnailWithButton(session, players[index]));
                 }
                 let message = new builder.Message(session).attachments(thumbnails).attachmentLayout('carousel');
                 builder.Prompts.choice(session, message, 'Choose player');
-                session.send(message);
                 builder.Prompts.choice(session, '', ['Player Not Listed', 'Retype Name']);
             } else {
                 next({ response: { entity: 'Player Not Listed' } });
@@ -120,7 +116,7 @@ bot.dialog('/player', [
     },
     (session, results, next) => {
         if (results.response.entity === 'Player Not Listed') {
-            builder.Prompts.choice(session, 'What position does this player play?', ['QB', 'RB', 'WR', 'TE', 'K', 'DST']); // Unknown?
+            session.endDialog('Please retry your search by either entering a player or a position');
         } else if (results.response.entity === 'Retype Name') {
             // send back to beginning
         } else {
