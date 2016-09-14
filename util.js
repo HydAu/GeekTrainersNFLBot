@@ -1,11 +1,13 @@
 var sessionHelper = function () {
-    this._checkIsValidSession = function() {
-        if (session != undefined && session != null) {
+    var self = this;
+    this._checkIsValidSession = function(item) {
+        if (item != undefined && item != null) {
             return true;
         }
+        return false;
     }
 
-    this.setSession = function (session, key, value, private) {
+    self.setSession = function (session, key, value, private) {
         if (private) {
             session.privateConversationData.key = value;
         } else {
