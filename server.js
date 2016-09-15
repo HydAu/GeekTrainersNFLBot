@@ -89,7 +89,11 @@ bot.dialog('/player', [
         }
     },
     (session, results, next) => {
-        helper.handlePlayerPromptResults(session, results);
+         if (session.privateConversationData.wantsToCompare === true) {
+            session.endDialogWithResult(results);
+        } else {
+            helper.handlePlayerPromptResults(session, results);
+        }
     }
 ]);
 
