@@ -129,4 +129,15 @@ bot.dialog('/comparePlayers', [
     (session) => {
         builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
     },
+    (session, results) => {
+        azureSearch.getPosition(results.response, (position) => {
+            if (position) {
+                session.privateConversationData.position = position;
+                session.beginDialog('/position');
+            } else {
+                session.privateConversationData.playerName = results.response;
+                session.beginDialog('/player');
+            }
+        });
+    }
 ]);
