@@ -83,12 +83,7 @@ bot.dialog('/player', [
                 .attachmentLayout('carousel');
             players.pop();
 
-            var prompts = {};
-            players.forEach((p) => {
-                prompts[p.nflId] = p;
-            });
-            console.log(prompts);
-            session.privateConversationData.playerPrompts = prompts;
+            let prompts = session.privateConversationData.playerPrompts = helper.convertPlayerArrayToPlayerPrompts(players);
 
             builder.Prompts.choice(session, message, prompts)
         } else {
@@ -125,26 +120,24 @@ bot.dialog('/stats', [
 
 
 bot.dialog('/position', [
-    function (session, results) { // "What Position does this player play?" // ShowTeams
-        positionChosen = session.privateConversationData.position;
+    (session, results) => { // "What Position does this player play?" // ShowTeams
         const teamThumbnails = helper.getTeamThumbnails(session, teams);
         const message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
         session.send(message);
         builder.Prompts.text(session, 'Type your team name');
     },
-    function (session, results) { // Get potential players from teamname/position
-        session.privateConversationData.teamChosen = results.response;
-        session.privateConversationData.playerTeamThumbnails = []
-        // positionChosen
-        sql.getPlayerList(positionChosen, session.privateConversationData.teamChosen, function (response) {
-            for (var i = 0; i < response.length; i++) {
-                var thumbnail = helper.getPlayerThumbnail(session, response[i], true);
-                playerTeamThumbnails.push(thumbnail);
-            }
-            playerTeamThumbnails = helper.sortByScore(playerTeamThumbnails);
-            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
-            session.send(message);
-            session.privateConversationData.playerTeamThumbnails = [];
+    (session, results) => { // Get potential players from teamname/position
+        const teamChosen = session.privateConversationData.teamChosen = results.response;
+        const positionChosen = session.privateConversationData.position;
+        sql.getPlayerList(positionChosen.Abbr, teamChosen, (players) => {
+            const prompts = session.privateConversationData.playerPrompts = helper.convertPlayerArrayToPlayerPrompts(players);
+            const playerTeamThumbnails = players.map(player => helper.getPlayerThumbnail(session, player, true));    
+            const message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+            // session.send(message);
+            builder.Prompts.choice(session, message, prompts);
         });
+    },
+    (session, results) => { // route them
+        
     }
 ]);
