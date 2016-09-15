@@ -17,7 +17,6 @@ const querystring = require('querystring');
 const sql = require('./sql');
 const sessionHelper = require('./sessionHelper.js')
 let teamThumbnails = [];
-let teamChosen = null;
 const teams = [
     { teamname: 'San Diego Chargers', abbr: 'SD' },
     { teamname: 'Denver Broncos', abbr: 'DEN' },
