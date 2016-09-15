@@ -113,6 +113,14 @@ var helper = function() {
 
         return thumbnail;
     };
+
+    self.convertPlayerArrayToPlayerPrompts = (players) => {
+        let prompts = {};
+        players.forEach((player) => {
+            prompts[player.nflId] = player;
+        });
+        return prompts;
+    }
 };
 
 module.exports = new helper();
