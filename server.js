@@ -81,7 +81,8 @@ bot.dialog('/player', [
     (session, results, next) => {
         if (results.response.entity.toLowerCase() === 'yes') {
             if (session.privateConversationData.wantsToCompare === true) {
-                // session.endDialogWithResult(results);
+                console.log('here');
+                session.endDialogWithResult(results);
             } else {
                 session.privateConversationData.currentPlayer = session.privateConversationData.firstPlayer;
                 session.beginDialog('/stats');
@@ -153,8 +154,18 @@ bot.dialog('/comparePlayers', [
         });
     },
     (session, results) => {
-        let firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
-        console.log(firstPlayerChosen)
+        let firstPlayerChosen;
+        if (results.response.entity === 'Yes') {
+            if(session.privateConversationData.firstPlayerChosen){
+                console.log('here1')
+                session.privateConversationData.secondPlayerChosen = session.privateConversationData.firstPlayer
+            } else {
+                console.log('here')
+                firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.firstPlayer;
+            }
+        } else {
+            firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
+        }
         builder.Prompts.text(session, `Great! The first player you selected is ` + firstPlayerChosen.displayName + `. Now let's find the second player you're looking for... \n\n Enter a Player Name or Position`);
     },
     (session, results) => {
