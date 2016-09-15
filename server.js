@@ -8,8 +8,10 @@ const querystring = require('querystring');
 const sql = require('./sql');
 const sessionHelper = require('./sessionHelper.js')
 
+
 const server = restify.createServer();
 
+const recognizer = new builder.LuisRecognizer('https://api.projectoxford.ai/luis/v1/application?id=27282e00-256c-42d4-8db9-ca58430840d2&subscription-key=bbe1f7c4514e468295bda81fd2c7b93a');
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
 });
@@ -22,7 +24,7 @@ const connector = new builder.ChatConnector({
 const bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-const dialog = new builder.IntentDialog()
+const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
     .onDefault([
         (session, args, next) => {
             builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
@@ -31,9 +33,14 @@ const dialog = new builder.IntentDialog()
             let response = results.response.entity.toLowerCase();
             session.replaceDialog('/', { message: { text: response } });
         }])
-    .matches(/^get ?stats$/i, [
-        (session, results) => {
-            builder.Prompts.text(session, 'Enter a Player Name or Position');
+    .matches('GetStats', [
+        (session, args, next) => {
+            const playerName =  builder.EntityRecognizer.findEntity(args.entities, 'player');
+            if (!playerName) {
+                 builder.Prompts.text(session, 'Enter a Player Name or Position');
+            } else {
+                next( { response: playerName.entity } );
+            }
         },
         (session, results, next) => {
             azureSearch.getPosition(results.response, (position) => {
@@ -78,13 +85,11 @@ bot.dialog('/player', [
     }
 ]);
 
-
 bot.dialog('/stats', [
     (session, results) => {
         sql.getPlayerStats(session.privateConversationData.currentPlayer.nflId, function (response) {
             var params = {}
             params.otherstats = response[0];
-            // send stat based on player Type
             params.stats = JSON.parse(response[0].stat);
             var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
             var message = new builder.Message(session).attachments([statThumbnail]);
@@ -93,7 +98,6 @@ bot.dialog('/stats', [
         });
     }
 ])
-
 
 bot.dialog('/position', [
     (session, results) => { // "What Position does this player play?" // ShowTeams
