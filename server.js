@@ -116,14 +116,6 @@ bot.dialog('/player', [
         }
     }
 ]);
-function findPlayer(session, integer){
-    let players = session.privateConversationData.players;
-    for(var i = 0; i<players.length; i++){
-        if(players[i].nflId == integer){
-            return players[i];
-        }
-    }
-}
 
 
 bot.dialog('/stats', [
