@@ -1,13 +1,3 @@
-/*
-    Updates:
-        - Get rid of global variables (thumbnails, position chosen, team chosen, etc.) - Norton
-        - Migrate out helper calls to separate files - Nannah
-        - Consolidate the two thumbnail methods - Nannah / Norton
-        - Take a look at the buttons to see if we can bind the player - Christopher
-        - Make teams a JSON file - Christopher / Duncan
-*/
-
-
 const azureSearch = require('./azureSearch.js');
 const teams = require('./teams.json')
 const restify = require('restify');
