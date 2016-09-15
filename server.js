@@ -57,8 +57,12 @@ bot.dialog('/player', [
         let path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
         path += querystring.escape(playerName);
         helper.loadData(path, function (result) {
-            let players = session.privateConversationData.players = result.value;
-            const thumbnail = helper.getPlayerThumbnail(session, players[0], false);
+
+            let allPlayers = result.value;
+            let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
+            const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
+            const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
+
             const message = new builder.Message(session).attachments([thumbnail]);
             session.send(message);
             builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
@@ -71,7 +75,7 @@ bot.dialog('/player', [
         } else if (session.privateConversationData.playerRecommendations.length > 1) {
             const players = session.privateConversationData.playerRecommendations;
             let thumbnails = [];
-            for (let index = 1; index < (players.length < 6 ? players.length : 5); index++) {
+            for (let index = 0; index < (players.length < 6 ? players.length : 5); index++) {
                 thumbnails.push(helper.getPlayerThumbnail(session, players[index], true));
             }
             let message = new builder
