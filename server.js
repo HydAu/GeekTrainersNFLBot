@@ -166,6 +166,6 @@ bot.dialog('/comparePlayers', [
     },
     (session, results) => {
         let secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
-        builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName);
+        builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  `+ session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
     },
 ]);
