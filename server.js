@@ -7,9 +7,6 @@ const https = require('https');
 const querystring = require('querystring');
 const sql = require('./sql');
 const sessionHelper = require('./sessionHelper.js')
-let teamThumbnails = [];
-
-
 
 const server = restify.createServer();
 
@@ -28,7 +25,6 @@ server.post('/api/messages', connector.listen());
 const dialog = new builder.IntentDialog()
     .onDefault([
         (session, args, next) => {
-            teamThumbnails = helper.getTeamThumbnails(session, teams);
             builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
         },
         (session, results, next) => {
@@ -131,7 +127,8 @@ bot.dialog('/stats', [
 bot.dialog('/position', [
     function (session, results) { // "What Position does this player play?" // ShowTeams
         positionChosen = session.privateConversationData.position;
-        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
+        const teamThumbnails = helper.getTeamThumbnails(session, teams);
+        const message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
         session.send(message);
         builder.Prompts.text(session, 'Type your team name');
     },
