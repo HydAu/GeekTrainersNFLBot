@@ -2,6 +2,13 @@ const https = require('https');
 const querystring = require('querystring');
 
 module.exports = {
+    getPlayers: function(playerName, callback) {
+        let path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
+        path += querystring.escape(playerName);
+        this.loadData(path, (playerResults) => {
+            callback(playerResults.value);
+        });
+    },
     getPosition: function(position, callback) {
         var path = '/indexes/position/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=' + querystring.escape(position);
         this.loadData(path, (result) => {
@@ -9,7 +16,6 @@ module.exports = {
             else(callback(result.value[0]));
         });
     },
-
     loadData: function (path, callback) {
         var options = {
             host: 'nflbot.search.windows.net',

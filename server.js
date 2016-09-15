@@ -7,7 +7,6 @@ const https = require('https');
 const querystring = require('querystring');
 const sql = require('./sql');
 const sessionHelper = require('./sessionHelper.js')
-let teamThumbnails = [];
 
 
 const server = restify.createServer();
@@ -61,15 +60,11 @@ bot.dialog('/', dialog);
 bot.dialog('/player', [
     (session) => {
         let playerName = session.privateConversationData.playerName;
-        let path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
-        path += querystring.escape(playerName);
-        helper.loadData(path, function (result) {
-
-            let allPlayers = result.value;
+        session.sendTyping();
+        azureSearch.getPlayers(playerName, (allPlayers) => {
             let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
             const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
             const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
-
             const message = new builder.Message(session).attachments([thumbnail]);
             session.send(message);
             builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
@@ -80,37 +75,13 @@ bot.dialog('/player', [
             session.privateConversationData.currentPlayer = session.privateConversationData.firstPlayer;
             session.beginDialog('/stats');
         } else if (session.privateConversationData.playerRecommendations.length > 1) {
-            const players = session.privateConversationData.playerRecommendations;
-            let thumbnails = [];
-            for (let index = 0; index < (players.length < 6 ? players.length : 5); index++) {
-                thumbnails.push(helper.getPlayerThumbnail(session, players[index], true));
-            }
-            let message = new builder
-                .Message(session)
-                .attachments(thumbnails)
-                .attachmentLayout('carousel');
-            players.pop();
-
-            var prompts = {};
-            players.forEach((p) => {
-                prompts[p.nflId] = p;
-            });
-            session.privateConversationData.playerPrompts = prompts;
-
-            builder.Prompts.choice(session, message, prompts)
+            helper.sendPlayerPrompts(session, session.privateConversationData.playerRecommendations);
         } else {
-            next({ response: { entity: 'Player Not Listed' } });
+            next();
         }
     },
     (session, results, next) => {
-        if (results.response.entity === 'Player Not Listed') {
-            session.send('So sorry. Do not know that one.');
-            session.replaceDialog('/', { message: { text: response } });
-        } else {
-            //need results.response to be the nfl id
-            session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
-            session.replaceDialog('/stats');
-        }
+        helper.handlePlayerPromptResults(session, results);
     }
 ]);
 
@@ -123,32 +94,26 @@ bot.dialog('/stats', [
             var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
             var message = new builder.Message(session).attachments([statThumbnail]);
             session.send(message);
-            session.replaceDialog('/');
-
+            session.endConversation();
         });
     }
 ])
 
 bot.dialog('/position', [
-    function (session, results) { // "What Position does this player play?" // ShowTeams
-        positionChosen = session.privateConversationData.position;
-        var message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
+    (session, results) => { // "What Position does this player play?" // ShowTeams
+        const teamThumbnails = helper.getTeamThumbnails(session, teams);
+        const message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
         session.send(message);
         builder.Prompts.text(session, 'Type your team name');
     },
-    function (session, results) { // Get potential players from teamname/position
-        session.privateConversationData.teamChosen = results.response;
-        session.privateConversationData.playerTeamThumbnails = []
-        // positionChosen
-        sql.getPlayerList(positionChosen, session.privateConversationData.teamChosen, function (response) {
-            for (var i = 0; i < response.length; i++) {
-                var thumbnail = helper.getPlayerThumbnail(session, response[i], true);
-                playerTeamThumbnails.push(thumbnail);
-            }
-            playerTeamThumbnails = helper.sortByScore(playerTeamThumbnails);
-            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
-            session.send(message);
-            session.privateConversationData.playerTeamThumbnails = [];
+    (session, results) => { // Get potential players from teamname/position
+        const teamChosen = session.privateConversationData.teamChosen = results.response;
+        const positionChosen = session.privateConversationData.position;
+        sql.getPlayerList(positionChosen.Abbr, teamChosen, (players) => {
+            helper.sendPlayerPrompts(session, players);
         });
+    },
+    (session, results) => { // route them
+        helper.handlePlayerPromptResults(session, results);
     }
 ]);

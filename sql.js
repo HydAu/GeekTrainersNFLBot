@@ -45,7 +45,7 @@ var wrapper = function () {
 
     self.getPlayerList = function(position, team, callback) {
         self.sql.execute({
-            query: "SELECT * FROM Player WHERE position = @position AND teamfullname = @team order by score desc",
+            query: "SELECT * FROM Player WHERE position = @position AND teamfullname = @team ORDER BY score DESC",
             params: {
                 position: {
                     type: self.sql.NVARCHAR,
