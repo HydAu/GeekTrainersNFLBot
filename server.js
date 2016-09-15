@@ -9,7 +9,7 @@
 
 
 const azureSearch = require('./azureSearch.js');
-
+const teams = require('./teams.json')
 const restify = require('restify');
 const builder = require('botbuilder');
 const https = require('https');
@@ -22,14 +22,17 @@ let positionChosen = null;
 let teamChosen = null;
 
 const server = restify.createServer();
+
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
+    console.log(teams);
 });
 
 const connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
 const bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 

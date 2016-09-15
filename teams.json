@@ -1,131 +1,131 @@
 {
     "teams": [
         {
-            "teamname": "SanDiegoChargers",
+            "teamname": "San Diego Chargers",
             "abbr": "SD"
         },
         {
-            "teamname": "DenverBroncos",
+            "teamname": "Denver Broncos",
             "abbr": "DEN"
         },
         {
-            "teamname": "OaklandRaiders",
+            "teamname": "Oakland Raiders",
             "abbr": "OAK"
         },
         {
-            "teamname": "KansasCityChiefs",
+            "teamname": "Kansas City Chiefs",
             "abbr": "KC"
         },
         {
-            "teamname": "JacksonvilleJaguars",
+            "teamname": "Jacksonville Jaguars",
             "abbr": "JAX"
         },
         {
-            "teamname": "TennesseeTitans",
+            "teamname": "Tennessee Titans",
             "abbr": "TEN"
         },
         {
-            "teamname": "HoustonTexans",
+            "teamname": "Houston Texans",
             "abbr": "HOU"
         },
         {
-            "teamname": "IndianapolisColts",
+            "teamname": "Indianapolis Colts",
             "abbr": "IND"
         },
         {
-            "teamname": "NewEnglandPatriots",
+            "teamname": "New England Patriots",
             "abbr": "NE"
         },
         {
-            "teamname": "NewYorkJets",
+            "teamname": "New York Jets",
             "abbr": "NYJ"
         },
         {
-            "teamname": "BuffaloBills",
+            "teamname": "Buffalo Bills",
             "abbr": "BUF"
         },
         {
-            "teamname": "MiamiDolphins",
+            "teamname": "Miami Dolphins",
             "abbr": "MIA"
         },
         {
-            "teamname": "PittsburghSteelers",
+            "teamname": "Pittsburgh Steelers",
             "abbr": "PIT"
         },
         {
-            "teamname": "BaltimoreRavens",
+            "teamname": "Baltimore Ravens",
             "abbr": "BAL"
         },
         {
-            "teamname": "CincinnatiBengals",
+            "teamname": "Cincinnati Bengals",
             "abbr": "CIN"
         },
         {
-            "teamname": "ClevelandBrowns",
+            "teamname": "Cleveland Browns",
             "abbr": "CLE"
         },
         {
-            "teamname": "CarolinaPanthers",
+            "teamname": "Carolina Panthers",
             "abbr": "CAR"
         },
         {
-            "teamname": "AtlantaFalcons",
+            "teamname": "Atlanta Falcons",
             "abbr": "ATL"
         },
         {
-            "teamname": "NewOrleansSaints",
+            "teamname": "New Orleans Saints",
             "abbr": "NO"
         },
         {
-            "teamname": "TampaBayBuccaneers",
+            "teamname": "Tampa Bay Buccaneers",
             "abbr": "TB"
         },
         {
-            "teamname": "GreenBayPackers",
+            "teamname": "Green Bay Packers",
             "abbr": "GB"
         },
         {
-            "teamname": "MinnesotaVikings",
+            "teamname": "Minnesota Vikings",
             "abbr": "MIN"
         },
         {
-            "teamname": "ChicagoBears",
+            "teamname": "Chicago Bears",
             "abbr": "CHI"
         },
         {
-            "teamname": "DetriotLions",
+            "teamname": "Detriot Lions",
             "abbr": "DET"
         },
         {
-            "teamname": "SanFrancisco49ers",
+            "teamname": "San Francisco 49ers",
             "abbr": "SF"
         },
         {
-            "teamname": "ArizonaCardinals",
+            "teamname": "Arizona Cardinals",
             "abbr": "ARI"
         },
         {
-            "teamname": "LosAngelesRams",
+            "teamname": "Los Angeles Rams",
             "abbr": "LA"
         },
         {
-            "teamname": "SeattleSeahawks",
+            "teamname": "Seattle Seahawks",
             "abbr": "SEA"
         },
         {
-            "teamname": "DallasCowboys",
+            "teamname": "Dallas Cowboys",
             "abbr": "DAL"
         },
         {
-            "teamname": "WashingtonRedskins",
+            "teamname": "Washington Redskins",
             "abbr": "WAS"
         },
         {
-            "teamname": "NewYorkGiants",
+            "teamname": "New York Giants",
             "abbr": "NYG"
         },
         {
-            "teamname": "PhiladelphiaEagles",
+            "teamname": "Philadelphia Eagles",
             "abbr": "PHI"
         }
     ]
