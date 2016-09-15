@@ -17,7 +17,6 @@ const querystring = require('querystring');
 const sql = require('./sql');
 const sessionHelper = require('./sessionHelper.js')
 let teamThumbnails = [];
-let playerTeamThumbnails = [];
 let positionChosen = null;
 let teamChosen = null;
 const teams = [
@@ -177,16 +176,17 @@ bot.dialog('/position', [
     },
     function (session, results) { // Get potential players from teamname/position
         teamChosen = results.response;
+        session.privateConversationData.playerTeamThumbnails = []
         // positionChosen
         sql.getPlayerList(positionChosen, teamChosen, function (response) {
             for (var i = 0; i < response.length; i++) {
                 var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
-                playerTeamThumbnails.push(thumbnail);
+                session.privateConversationData.playerTeamThumbnails.push(thumbnail);
             }
-            playerTeamThumbnails = sortByScore(playerTeamThumbnails);
-            var message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
+            session.privateConversationData.playerTeamThumbnails = sortByScore(session.privateConversationData.playerTeamThumbnails);
+            var message = new builder.Message(session).attachments(session.privateConversationData.playerTeamThumbnails).attachmentLayout('carousel');
             session.send(message);
-            playerTeamThumbnails = [];
+            session.privateConversationData.playerTeamThumbnails = [];
         });
     }
 ]);
