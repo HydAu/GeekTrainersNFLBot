@@ -174,10 +174,10 @@ bot.dialog('/position', [
         builder.Prompts.text(session, 'Type your team name');
     },
     function (session, results) { // Get potential players from teamname/position
-        teamChosen = results.response;
+        session.privateConversationData.teamChosen = results.response;
         session.privateConversationData.playerTeamThumbnails = []
         // positionChosen
-        sql.getPlayerList(positionChosen, teamChosen, function (response) {
+        sql.getPlayerList(positionChosen, session.privateConversationData.teamChosen, function (response) {
             for (var i = 0; i < response.length; i++) {
                 var thumbnail = getPlayerThumbnailWithButton(session, response[i]);
                 session.privateConversationData.playerTeamThumbnails.push(thumbnail);
