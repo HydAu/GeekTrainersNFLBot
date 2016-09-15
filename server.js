@@ -24,10 +24,10 @@ const connector = new builder.ChatConnector({
 const bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
+const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
     .onDefault([
         (session, args, next) => {
-            builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
+            builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats', 'Compare Players']);
         },
         (session, results, next) => {
             let response = results.response.entity.toLowerCase();
@@ -35,11 +35,12 @@ const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
         }])
     .matches('GetStats', [
         (session, args, next) => {
-            const playerName =  builder.EntityRecognizer.findEntity(args.entities, 'player');
+            session.privateConversationData.wantsToCompare = false;
+            const playerName = builder.EntityRecognizer.findEntity(args.entities, 'player');
             if (!playerName) {
-                 builder.Prompts.text(session, 'Enter a Player Name or Position');
+                builder.Prompts.text(session, 'Enter a Player Name or Position');
             } else {
-                next( { response: playerName.entity } );
+                next({ response: playerName.entity });
             }
         },
         (session, results, next) => {
@@ -53,6 +54,13 @@ const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
                 }
             });
         }
+    ])
+    .matches(/^compare ?players$/i, [
+        (session, args) => {
+            session.privateConversationData.wantsToCompare = true;
+            session.replaceDialog('/comparePlayers');
+        }
+
     ]);
 
 bot.dialog('/', dialog);
@@ -116,4 +124,9 @@ bot.dialog('/position', [
     (session, results) => { // route them
         helper.handlePlayerPromptResults(session, results);
     }
+]);
+bot.dialog('/comparePlayers', [
+    (session) => {
+        builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
+    },
 ]);
