@@ -1,0 +1,132 @@
+{
+    "teams": [
+        {
+            "teamname": "SanDiegoChargers",
+            "abbr": "SD"
+        },
+        {
+            "teamname": "DenverBroncos",
+            "abbr": "DEN"
+        },
+        {
+            "teamname": "OaklandRaiders",
+            "abbr": "OAK"
+        },
+        {
+            "teamname": "KansasCityChiefs",
+            "abbr": "KC"
+        },
+        {
+            "teamname": "JacksonvilleJaguars",
+            "abbr": "JAX"
+        },
+        {
+            "teamname": "TennesseeTitans",
+            "abbr": "TEN"
+        },
+        {
+            "teamname": "HoustonTexans",
+            "abbr": "HOU"
+        },
+        {
+            "teamname": "IndianapolisColts",
+            "abbr": "IND"
+        },
+        {
+            "teamname": "NewEnglandPatriots",
+            "abbr": "NE"
+        },
+        {
+            "teamname": "NewYorkJets",
+            "abbr": "NYJ"
+        },
+        {
+            "teamname": "BuffaloBills",
+            "abbr": "BUF"
+        },
+        {
+            "teamname": "MiamiDolphins",
+            "abbr": "MIA"
+        },
+        {
+            "teamname": "PittsburghSteelers",
+            "abbr": "PIT"
+        },
+        {
+            "teamname": "BaltimoreRavens",
+            "abbr": "BAL"
+        },
+        {
+            "teamname": "CincinnatiBengals",
+            "abbr": "CIN"
+        },
+        {
+            "teamname": "ClevelandBrowns",
+            "abbr": "CLE"
+        },
+        {
+            "teamname": "CarolinaPanthers",
+            "abbr": "CAR"
+        },
+        {
+            "teamname": "AtlantaFalcons",
+            "abbr": "ATL"
+        },
+        {
+            "teamname": "NewOrleansSaints",
+            "abbr": "NO"
+        },
+        {
+            "teamname": "TampaBayBuccaneers",
+            "abbr": "TB"
+        },
+        {
+            "teamname": "GreenBayPackers",
+            "abbr": "GB"
+        },
+        {
+            "teamname": "MinnesotaVikings",
+            "abbr": "MIN"
+        },
+        {
+            "teamname": "ChicagoBears",
+            "abbr": "CHI"
+        },
+        {
+            "teamname": "DetriotLions",
+            "abbr": "DET"
+        },
+        {
+            "teamname": "SanFrancisco49ers",
+            "abbr": "SF"
+        },
+        {
+            "teamname": "ArizonaCardinals",
+            "abbr": "ARI"
+        },
+        {
+            "teamname": "LosAngelesRams",
+            "abbr": "LA"
+        },
+        {
+            "teamname": "SeattleSeahawks",
+            "abbr": "SEA"
+        },
+        {
+            "teamname": "DallasCowboys",
+            "abbr": "DAL"
+        },
+        {
+            "teamname": "WashingtonRedskins",
+            "abbr": "WAS"
+        },
+        {
+            "teamname": "NewYorkGiants",
+            "abbr": "NYG"
+        },
+        {
+            "teamname": "PhiladelphiaEagles",
+            "abbr": "PHI"
+        }
+    ]
+}
