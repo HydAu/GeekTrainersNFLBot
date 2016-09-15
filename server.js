@@ -145,7 +145,9 @@ bot.dialog('/comparePlayers', [
         });
     },
     (session, results) => {
-        builder.Prompts.text(session, `Now let's find the second player you're looking for... \n\n Enter a Player Name or Position`);
-        console.log(results)
-    }
+        let firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
+        console.log(firstPlayerChosen)
+        builder.Prompts.text(session, `Great! The first player you selected is ` + firstPlayerChosen.displayName + `. Now let's find the second player you're looking for... \n\n Enter a Player Name or Position`);
+    },
+    
 ]);
