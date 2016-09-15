@@ -9,6 +9,8 @@ const sql = require('./sql');
 const sessionHelper = require('./sessionHelper.js')
 let teamThumbnails = [];
 
+
+
 const server = restify.createServer();
 
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -26,6 +28,7 @@ server.post('/api/messages', connector.listen());
 const dialog = new builder.IntentDialog()
     .onDefault([
         (session, args, next) => {
+            teamThumbnails = helper.getTeamThumbnails(session, teams);
             builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
         },
         (session, results, next) => {
