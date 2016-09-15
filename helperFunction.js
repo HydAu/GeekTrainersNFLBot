@@ -1,17 +1,22 @@
 const https = require('https');
 const builder = require('botbuilder');
 
-module.exports = {
+var helper = function () {
+    let self = this;
 
-    getCurrentTeamThumbnail: (session, team) => {
+    self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
+
+    self.getCurrentTeamThumbnail = (session, team) => {
+        console.log(team)
         var thumbnail = new builder.ThumbnailCard(session);
         thumbnail.title(team.teamname);
         var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + team.abbr + '/' + team.abbr + '_logo-80x90.gif';
         thumbnail.images([builder.CardImage.create(session, imageUrl)])
+        // console.log(thumbnail)
         return thumbnail;
-    },
+    };
 
-    getPlayerThumbnail: (session, player, button) => {
+    self.getPlayerThumbnail = (session, player, button) => {
         try {
             var thumbnail = new builder.ThumbnailCard(session);
             thumbnail.title(player.displayName);
@@ -39,8 +44,9 @@ module.exports = {
         } catch (err) {
             console.log(err)
         }
-    },
-    loadData: (path, callback) => {
+    };
+
+    self.loadData = (path, callback) => {
         var options = {
             host: 'nflbot.search.windows.net',
             port: 443,
@@ -55,8 +61,9 @@ module.exports = {
             });
         });
         request.end();
-    },
-    sortByScore: (thumbnails) => {
+    };
+
+    self.sortByScore = (thumbnails) => {
         thumbnails = thumbnails.slice(1);
         for (var i = 0; i < thumbnails.length; i++) {
             var maximumScore = thumbnails[i].data.score;
@@ -74,8 +81,9 @@ module.exports = {
             }
         }
         return thumbnails;
-    },
-    getPlayerStatsThumbnail: (session, player) => {
+    };
+
+    self.getPlayerStatsThumbnail = (session, player) => {
         var thumbnail = new builder.ThumbnailCard(session);
         var text = '';
         thumbnail.title(player.otherstats.displayName)
@@ -104,5 +112,39 @@ module.exports = {
         thumbnail.text(text);
 
         return thumbnail;
+    };
+
+    self.convertPlayerArrayToPlayerPrompts = (players) => {
+        let prompts = {};
+        players.forEach((player) => {
+            prompts[player.nflId] = player;
+        });
+        return prompts;
+    }
+
+    self.sendPlayerPrompts = (session, players) => {
+        const thumbnails = players.map(player => self.getPlayerThumbnail(session, player, true));
+        let message = new builder
+            .Message(session)
+            .attachments(thumbnails)
+            .attachmentLayout('carousel');
+        let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
+        builder.Prompts.choice(session, message, prompts, { maxRetries: 0});
+    }
+
+    self.handlePlayerPromptResults = (session, results) => {
+        console.log(session.message);
+        if (!results.response) {
+            session.send('So sorry. Do not know that one. Beginning search for: ' + session.message.text);
+            session.replaceDialog('/', { message: { text: session.message.text } });
+        } else if (session.privateConversationData.playerPrompts[results.response.entity]) {
+            session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
+            session.beginDialog('/stats');
+        } else {
+            session.send('So sorry. Do not know that one.');
+            session.replaceDialog('/', { message: { text: results.response } });
+        }
     }
 };
+
+module.exports = new helper();
