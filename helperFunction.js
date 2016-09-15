@@ -3,6 +3,13 @@ const builder = require('botbuilder');
 
 module.exports = {
 
+    getTeamThumbnails: (teams) => {
+        const teamThumbnails = [];
+        for (let team in teams) {
+            teamThumbnails.push(getCurrentTeamThumbnail(team));
+        }
+        return teamThumbnails;
+    },
     getCurrentTeamThumbnail: (session, team) => {
         var thumbnail = new builder.ThumbnailCard(session);
         thumbnail.title(team.teamname);
