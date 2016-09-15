@@ -81,7 +81,7 @@ bot.dialog('/player', [
     (session, results, next) => {
         if (results.response.entity.toLowerCase() === 'yes') {
             if (session.privateConversationData.wantsToCompare === true) {
-                session.endDialogWithResult(results);
+                // session.endDialogWithResult(results);
             } else {
                 session.privateConversationData.currentPlayer = session.privateConversationData.firstPlayer;
                 session.beginDialog('/stats');
