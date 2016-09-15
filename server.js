@@ -1,3 +1,13 @@
+/*
+    Updates:
+        - Get rid of global variables (thumbnails, position chosen, team chosen, etc.
+        - Migrate out helper calls to separate files
+        - Take a look at the buttons to see if we can bind the player
+        - Make teams a JSON file
+        - Consolidate the two thumbnail methods
+*/
+
+
 const azureSearch = require('./azureSearch.js');
 
 const restify = require('restify');
@@ -54,23 +64,6 @@ const connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
-<<<<<<< HEAD
-
-var bot = new builder.UniversalBot(connector);
-server.post('/api/messages', connector.listen());
-
-let dialog = new builder.IntentDialog()
-    .onDefault((session, args, next) => {
-        let buttons = [new builder.CardAction.imBack(session, 'get stats', 'Get Stats')]
-        let message = new builder.HeroCard(session).title('What would you like to do?').buttons(buttons);
-
-        builder.Prompts.choice(session, message, ['Get Stats']);
-
-        // builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
-        next(); // end the dialog
-    })
-    .matches(/^get ?stats$/u, [
-=======
 const bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
@@ -84,7 +77,6 @@ const dialog = new builder.IntentDialog()
             session.replaceDialog('/', { message: { text: response } });
         }])
     .matches(/^get ?stats$/i, [
->>>>>>> e5422a45879cd2f995ea0ccfdd82a174e99b0245
         (session, results) => {
             builder.Prompts.text(session, 'Enter a Player Name or Position');
         },
