@@ -24,7 +24,7 @@ const connector = new builder.ChatConnector({
 const bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
+const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
     .onDefault([
         (session, args, next) => {
             builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
@@ -35,11 +35,11 @@ const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
         }])
     .matches('GetStats', [
         (session, args, next) => {
-            const playerName =  builder.EntityRecognizer.findEntity(args.entities, 'player');
+            const playerName = builder.EntityRecognizer.findEntity(args.entities, 'player');
             if (!playerName) {
-                 builder.Prompts.text(session, 'Enter a Player Name or Position');
+                builder.Prompts.text(session, 'Enter a Player Name or Position');
             } else {
-                next( { response: playerName.entity } );
+                next({ response: playerName.entity });
             }
         },
         (session, results, next) => {
@@ -63,11 +63,17 @@ bot.dialog('/player', [
         session.sendTyping();
         azureSearch.getPlayers(playerName, (allPlayers) => {
             let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
-            const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
-            const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
-            const message = new builder.Message(session).attachments([thumbnail]);
-            session.send(message);
-            builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+            if (firstPlayer) {
+                const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
+                const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
+                const message = new builder.Message(session).attachments([thumbnail]);
+                session.send(message);
+                builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+            } else {
+                session.send("Unable to find that player.");
+                session.endConversation();
+                session.replaceDialog("/"); // ('/', { message: { text: "get stats" } });
+            }
         });
     },
     (session, results, next) => {
