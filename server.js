@@ -122,7 +122,11 @@ bot.dialog('/position', [
         });
     },
     (session, results) => { // route them
-        helper.handlePlayerPromptResults(session, results);
+        if (session.privateConversationData.wantsToCompare === true) {
+            session.endDialogWithResult(results);
+        } else {
+            helper.handlePlayerPromptResults(session, results);
+        }
     }
 ]);
 bot.dialog('/comparePlayers', [
@@ -139,5 +143,9 @@ bot.dialog('/comparePlayers', [
                 session.beginDialog('/player');
             }
         });
+    },
+    (session, results) => {
+        builder.Prompts.text(session, `Now let's find the second player you're looking for... \n\n Enter a Player Name or Position`);
+        console.log(results)
     }
 ]);
