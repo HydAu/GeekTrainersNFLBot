@@ -53,15 +53,10 @@ bot.dialog('/', dialog);
 bot.dialog('/player', [
     (session) => {
         let playerName = session.privateConversationData.playerName;
-        let path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
-        path += querystring.escape(playerName);
-        helper.loadData(path, function (result) {
-
-            let allPlayers = result.value;
+        azureSearch.getPlayers(playerName, (allPlayers) => {
             let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
             const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
             const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
-
             const message = new builder.Message(session).attachments([thumbnail]);
             session.send(message);
             builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
@@ -82,9 +77,7 @@ bot.dialog('/player', [
                 .attachments(thumbnails)
                 .attachmentLayout('carousel');
             players.pop();
-
             let prompts = session.privateConversationData.playerPrompts = helper.convertPlayerArrayToPlayerPrompts(players);
-
             builder.Prompts.choice(session, message, prompts)
         } else {
             next({ response: { entity: 'Player Not Listed' } });
