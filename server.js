@@ -12,7 +12,6 @@ const server = restify.createServer();
 
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
-    console.log(teams);
 });
 
 const connector = new builder.ChatConnector({
@@ -57,8 +56,13 @@ bot.dialog('/player', [
         let path = '/indexes/tagscoreplayer/docs?api-version=2015-02-28&api-key=A1E4623A5329B55605CDE0380822AE57&search=';
         path += querystring.escape(playerName);
         loadData(path, function (result) {
-            let players = session.privateConversationData.players = result.value;
-            const thumbnail = getPlayerThumbnail(session, players[0]);
+            
+            // improve this
+            let allPlayers = result.value;
+            const thumbnail = getPlayerThumbnail(session, allPlayers[0]);
+            let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
+            const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
+
             const message = new builder.Message(session).attachments([thumbnail]);
             session.send(message);
             builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
@@ -66,12 +70,12 @@ bot.dialog('/player', [
     },
     (session, results, next) => {
         if (results.response.entity.toLowerCase() === 'yes') {
-            session.privateConversationData.currentPlayer = session.privateConversationData.players[0];
+            session.privateConversationData.currentPlayer = session.privateConversationData.firstPlayer;
             session.beginDialog('/stats');
-        } else if (session.privateConversationData.players.length > 1) {
-            const players = session.privateConversationData.players;
+        } else if (session.privateConversationData.playerRecommendations.length > 1) {
+            const players = session.privateConversationData.playerRecommendations;
             let thumbnails = [];
-            for (let index = 1; index < (players.length < 6 ? players.length : 5); index++) {
+            for (let index = 0; index < (players.length < 6 ? players.length : 5); index++) {
                 thumbnails.push(getPlayerThumbnailWithButton(session, players[index]));
             }
             let message = new builder
