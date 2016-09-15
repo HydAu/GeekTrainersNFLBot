@@ -1,24 +1,22 @@
 const https = require('https');
 const builder = require('botbuilder');
 
-module.exports = {
+var helper = function() {
+    let self = this;
 
-    getTeamThumbnails: (teams) => {
-        const teamThumbnails = [];
-        for (let team in teams) {
-            teamThumbnails.push(getCurrentTeamThumbnail(team));
-        }
-        return teamThumbnails;
-    },
-    getCurrentTeamThumbnail: (session, team) => {
+    self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
+    
+    self.getCurrentTeamThumbnail = (session, team) => {
+        console.log(team)
         var thumbnail = new builder.ThumbnailCard(session);
         thumbnail.title(team.teamname);
         var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + team.abbr + '/' + team.abbr + '_logo-80x90.gif';
         thumbnail.images([builder.CardImage.create(session, imageUrl)])
+        // console.log(thumbnail)
         return thumbnail;
-    },
-
-    getPlayerThumbnail: (session, player, button) => {
+    };
+    
+    self.getPlayerThumbnail = (session, player, button) => {
         try {
             var thumbnail = new builder.ThumbnailCard(session);
             thumbnail.title(player.displayName);
@@ -46,8 +44,9 @@ module.exports = {
         } catch (err) {
             console.log(err)
         }
-    },
-    loadData: (path, callback) => {
+    };
+    
+    self.loadData = (path, callback) => {
         var options = {
             host: 'nflbot.search.windows.net',
             port: 443,
@@ -62,8 +61,9 @@ module.exports = {
             });
         });
         request.end();
-    },
-    sortByScore: (thumbnails) => {
+    };
+    
+    self.sortByScore = (thumbnails) => {
         thumbnails = thumbnails.slice(1);
         for (var i = 0; i < thumbnails.length; i++) {
             var maximumScore = thumbnails[i].data.score;
@@ -81,8 +81,9 @@ module.exports = {
             }
         }
         return thumbnails;
-    },
-    getPlayerStatsThumbnail: (session, player) => {
+    };
+    
+    self.getPlayerStatsThumbnail = (session, player) => {
         var thumbnail = new builder.ThumbnailCard(session);
         var text = '';
         thumbnail.title(player.otherstats.displayName)
@@ -111,5 +112,7 @@ module.exports = {
         thumbnail.text(text);
 
         return thumbnail;
-    }
+    };
 };
+
+module.exports = new helper();
