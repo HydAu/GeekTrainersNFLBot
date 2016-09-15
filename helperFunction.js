@@ -129,7 +129,21 @@ var helper = function () {
             .attachments(thumbnails)
             .attachmentLayout('carousel');
         let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
-        builder.Prompts.choice(session, message, prompts);
+        builder.Prompts.choice(session, message, prompts, { maxRetries: 0});
+    }
+
+    self.handlePlayerPromptResults = (session, results) => {
+        console.log(session.message);
+        if (!results.response) {
+            session.send('So sorry. Do not know that one. Beginning search for: ' + session.message.text);
+            session.replaceDialog('/', { message: { text: session.message.text } });
+        } else if (session.privateConversationData.playerPrompts[results.response.entity]) {
+            session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
+            session.beginDialog('/stats');
+        } else {
+            session.send('So sorry. Do not know that one.');
+            session.replaceDialog('/', { message: { text: results.response } });
+        }
     }
 };
 

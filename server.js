@@ -53,6 +53,7 @@ bot.dialog('/', dialog);
 bot.dialog('/player', [
     (session) => {
         let playerName = session.privateConversationData.playerName;
+        session.sendTyping();
         azureSearch.getPlayers(playerName, (allPlayers) => {
             let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
             const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
@@ -69,18 +70,11 @@ bot.dialog('/player', [
         } else if (session.privateConversationData.playerRecommendations.length > 1) {
             helper.sendPlayerPrompts(session, session.privateConversationData.playerRecommendations);
         } else {
-            next({ response: { entity: 'Player Not Listed' } });
+            next();
         }
     },
     (session, results, next) => {
-        if (results.response.entity === 'Player Not Listed') {
-            session.send('So sorry. Do not know that one.');
-            session.replaceDialog('/', { message: { text: response } });
-        } else {
-            //need results.response to be the nfl id
-            session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
-            session.beginDialog('/stats');
-        }
+        helper.handlePlayerPromptResults(session, results);
     }
 ]);
 
@@ -95,7 +89,7 @@ bot.dialog('/stats', [
             var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
             var message = new builder.Message(session).attachments([statThumbnail]);
             session.send(message);
-
+            session.endConversation();
         });
     }
 ])
@@ -116,6 +110,6 @@ bot.dialog('/position', [
         });
     },
     (session, results) => { // route them
-        
+        helper.handlePlayerPromptResults(session, results);
     }
 ]);
