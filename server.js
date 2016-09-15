@@ -11,11 +11,11 @@ let playerTeamThumbnails = [];
 let positionChosen = null;
 let teamChosen = null;
 
+
 const server = restify.createServer();
 
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('listening');
-    console.log(teams);
 });
 
 const connector = new builder.ChatConnector({
