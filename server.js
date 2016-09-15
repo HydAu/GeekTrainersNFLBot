@@ -1,13 +1,3 @@
-/*
-    Updates:
-        - Get rid of global variables (thumbnails, position chosen, team chosen, etc.) - Norton
-        - Migrate out helper calls to separate files - Nannah
-        - Consolidate the two thumbnail methods - Nannah / Norton
-        - Take a look at the buttons to see if we can bind the player - Christopher
-        - Make teams a JSON file - Christopher / Duncan
-*/
-
-
 const azureSearch = require('./azureSearch.js');
 const teams = require('./teams.json')
 const restify = require('restify');
@@ -89,8 +79,15 @@ bot.dialog('/player', [
                 .attachments(thumbnails)
                 .attachmentLayout('carousel');
             players.pop();
-            builder.Prompts.choice(session, message, players.map(i => i.nflId))
-            // builder.Prompts.choice(session, '', ['Player Not Listed']);
+
+            var prompts = {};
+            players.forEach((p) => {
+                prompts[p.nflId] = p;
+            });
+            console.log(prompts);
+            session.privateConversationData.playerPrompts = prompts;
+
+            builder.Prompts.choice(session, message, prompts)
         } else {
             next({ response: { entity: 'Player Not Listed' } });
         }
@@ -101,21 +98,11 @@ bot.dialog('/player', [
             session.replaceDialog('/', { message: { text: response } });
         } else {
             //need results.response to be the nfl id
-            let nflID = results.response.entity;
-            var player = findPlayer(session, nflID);
-            session.privateConversationData.currentPlayer = player;
+            session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
             session.beginDialog('/stats');
         }
     }
 ]);
-function findPlayer(session, integer){
-    let players = session.privateConversationData.players;
-    for(var i = 0; i<players.length; i++){
-        if(players[i].nflId == integer){
-            return players[i];
-        }
-    }
-}
 
 
 bot.dialog('/stats', [
