@@ -67,18 +67,7 @@ bot.dialog('/player', [
             session.privateConversationData.currentPlayer = session.privateConversationData.firstPlayer;
             session.beginDialog('/stats');
         } else if (session.privateConversationData.playerRecommendations.length > 1) {
-            const players = session.privateConversationData.playerRecommendations;
-            let thumbnails = [];
-            for (let index = 0; index < (players.length < 6 ? players.length : 5); index++) {
-                thumbnails.push(helper.getPlayerThumbnail(session, players[index], true));
-            }
-            let message = new builder
-                .Message(session)
-                .attachments(thumbnails)
-                .attachmentLayout('carousel');
-            players.pop();
-            let prompts = session.privateConversationData.playerPrompts = helper.convertPlayerArrayToPlayerPrompts(players);
-            builder.Prompts.choice(session, message, prompts)
+            helper.sendPlayerPrompts(session, session.privateConversationData.playerRecommendations);
         } else {
             next({ response: { entity: 'Player Not Listed' } });
         }
@@ -123,11 +112,7 @@ bot.dialog('/position', [
         const teamChosen = session.privateConversationData.teamChosen = results.response;
         const positionChosen = session.privateConversationData.position;
         sql.getPlayerList(positionChosen.Abbr, teamChosen, (players) => {
-            const prompts = session.privateConversationData.playerPrompts = helper.convertPlayerArrayToPlayerPrompts(players);
-            const playerTeamThumbnails = players.map(player => helper.getPlayerThumbnail(session, player, true));    
-            const message = new builder.Message(session).attachments(playerTeamThumbnails).attachmentLayout('carousel');
-            // session.send(message);
-            builder.Prompts.choice(session, message, prompts);
+            helper.sendPlayerPrompts(session, players);
         });
     },
     (session, results) => { // route them

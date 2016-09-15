@@ -1,11 +1,11 @@
 const https = require('https');
 const builder = require('botbuilder');
 
-var helper = function() {
+var helper = function () {
     let self = this;
 
     self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
-    
+
     self.getCurrentTeamThumbnail = (session, team) => {
         console.log(team)
         var thumbnail = new builder.ThumbnailCard(session);
@@ -15,7 +15,7 @@ var helper = function() {
         // console.log(thumbnail)
         return thumbnail;
     };
-    
+
     self.getPlayerThumbnail = (session, player, button) => {
         try {
             var thumbnail = new builder.ThumbnailCard(session);
@@ -45,7 +45,7 @@ var helper = function() {
             console.log(err)
         }
     };
-    
+
     self.loadData = (path, callback) => {
         var options = {
             host: 'nflbot.search.windows.net',
@@ -62,7 +62,7 @@ var helper = function() {
         });
         request.end();
     };
-    
+
     self.sortByScore = (thumbnails) => {
         thumbnails = thumbnails.slice(1);
         for (var i = 0; i < thumbnails.length; i++) {
@@ -82,7 +82,7 @@ var helper = function() {
         }
         return thumbnails;
     };
-    
+
     self.getPlayerStatsThumbnail = (session, player) => {
         var thumbnail = new builder.ThumbnailCard(session);
         var text = '';
@@ -120,6 +120,16 @@ var helper = function() {
             prompts[player.nflId] = player;
         });
         return prompts;
+    }
+
+    self.sendPlayerPrompts = (session, players) => {
+        const thumbnails = players.map(player => self.getPlayerThumbnail(session, player, true));
+        let message = new builder
+            .Message(session)
+            .attachments(thumbnails)
+            .attachmentLayout('carousel');
+        let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
+        builder.Prompts.choice(session, message, prompts);
     }
 };
 
