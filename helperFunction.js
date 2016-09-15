@@ -129,7 +129,7 @@ var helper = function () {
             .attachments(thumbnails)
             .attachmentLayout('carousel');
         let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
-        builder.Prompts.choice(session, message, prompts, { maxRetries: 0});
+        builder.Prompts.choice(session, message, prompts, { maxRetries: 0 });
     }
 
     self.handlePlayerPromptResults = (session, results) => {
