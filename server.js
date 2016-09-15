@@ -123,8 +123,15 @@ bot.dialog('/player', [
                 .attachments(thumbnails)
                 .attachmentLayout('carousel');
             players.pop();
-            builder.Prompts.choice(session, message, players.map(i => i.nflId))
-            // builder.Prompts.choice(session, '', ['Player Not Listed']);
+
+            var prompts = {};
+            players.forEach((p) => {
+                prompts[p.nflId] = p;
+            });
+            console.log(prompts);
+            session.privateConversationData.playerPrompts = prompts;
+
+            builder.Prompts.choice(session, message, prompts)
         } else {
             next({ response: { entity: 'Player Not Listed' } });
         }
@@ -135,9 +142,7 @@ bot.dialog('/player', [
             session.replaceDialog('/', { message: { text: response } });
         } else {
             //need results.response to be the nfl id
-            let nflID = results.response.entity;
-            var player = findPlayer(session, nflID);
-            session.privateConversationData.currentPlayer = player;
+            session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
             session.beginDialog('/stats');
         }
     }
