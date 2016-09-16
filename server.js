@@ -181,5 +181,23 @@ bot.dialog('/comparePlayers', [
             secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
         }
         builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
+        sql.getPlayerStats(session.privateConversationData.firstPlayerChosen.nflId, function (response) {
+            var params = {}
+            params.otherstats = response[0];
+            params.stats = JSON.parse(response[0].stat);
+            var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
+            var message = new builder.Message(session).attachments([statThumbnail]);
+            session.send(message);
+            session.endConversation();
+        });
+        sql.getPlayerStats(session.privateConversationData.secondPlayerChosen.nflId, function (response) {
+            var params = {}
+            params.otherstats = response[0];
+            params.stats = JSON.parse(response[0].stat);
+            var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
+            var message = new builder.Message(session).attachments([statThumbnail]);
+            session.send(message);
+            session.endConversation();
+        });
     },
 ]);
