@@ -32,7 +32,7 @@ var helper = function() {
                 // thumbnail.buttons([
                 //     new builder.CardAction.postBack(session, player.nflId, 'Select')
                 // ]);
-                thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
+                // thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
             } else {
                 // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
                 var urlPlayer = player.displayName.replace(' ', '').replace('-', '').toLowerCase();
@@ -84,6 +84,8 @@ var helper = function() {
 
     self.getPlayerStatsThumbnail = (session, player) => {
         var thumbnail = new builder.ThumbnailCard(session);
+        var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.otherstats.esbId + '.png '
+        thumbnail.images([builder.CardImage.create(session, imageUrl)]);
         var text = '';
         thumbnail.title(player.otherstats.displayName)
         thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
@@ -130,7 +132,9 @@ var helper = function() {
             .attachments(thumbnails)
             .attachmentLayout('carousel');
         let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
-        builder.Prompts.choice(session, message, prompts, { maxRetries: 0 });
+        // builder.Prompts.choice(session, message, prompts, { maxRetries: 0 });
+        session.send(message);
+        builder.Prompts.text('some string.');
     }
 
     self.handlePlayerPromptResults = (session, results) => {
