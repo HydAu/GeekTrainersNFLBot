@@ -145,37 +145,41 @@ var helper = function () {
             session.replaceDialog('/', { message: { text: results.response } });
         }
     },
-        self.getPlayerScoreForComparison = (nflID) => {
+        self.getPlayerScoreForComparison = (nflID, callback) => {
             sql.getPlayerStats(nflID, function (response) {
                 var params = {}
                 params.otherstats = response[0];
                 params.stats = JSON.parse(response[0].stat);
-                console.log(params.stats.passing.yards * .04);
-                var firstPlayerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
-                console.log(firstPlayerPoints);
-                return firstPlayerPoints;
+                var playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
+                callback(playerPoints);
             });
         },
-        self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen) => {
-            let secondPlayerPoints = self.getPlayerScoreForComparison(secondNFLID);
-            let firstPlayerPoints = self.getPlayerScoreForComparison(firstNFLID);
-            let text;
+        self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen, callback) => {
+            let secondPlayerPoints;
+            let firstPlayerPoints;
             let betterPlayer;
             let worsePlayer;
             let betterPoints;
             let worsePoints
-            if (secondPlayerPoints < firstPlayerPoints) {
-                betterPlayer = session.privateConversationData.firstPlayerChosen;
-                worsePlayer = secondPlayerChosen;
-                worsePoints = secondPlayerPoints;
-                betterPoints = firstPlayerPoints;
-            } else {
-                betterPlayer = secondPlayerChosen;
-                worsePlayer = session.privateConversationData.firstPlayerChosen;
-                worsePoints = firstPlayerPoints;
-                betterPoints = secondPlayerPoints;
-            }
-            return betterPlayer.displayName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayer.displayName + " (" + worsePoints + " FPTS)."
+            self.getPlayerScoreForComparison(firstNFLID, (response) => {
+                self.getPlayerScoreForComparison(secondNFLID, (secondResponse) => {
+                    firstPlayerPoints = response;
+                    secondPlayerPoints =  secondResponse;
+                    if (secondPlayerPoints < firstPlayerPoints) {
+                        betterPlayer = session.privateConversationData.firstPlayerChosen.displayName;
+                        worsePlayer = secondPlayerChosen.displayName;
+                        worsePoints = parseInt(secondPlayerPoints);
+                        betterPoints = parseInt(firstPlayerPoints);
+                    } else {
+                        betterPlayer = secondPlayerChosen.displayName;
+                        worsePlayer = session.privateConversationData.firstPlayerChosen.displayName;
+                        worsePoints = parseInt(firstPlayerPoints);
+                        betterPoints = parseInt(secondPlayerPoints);
+                    }
+                    var text = betterPlayer + " (" + betterPoints + " FPTS) had a better week than " + worsePlayer + " (" + worsePoints + " FPTS)."
+                    callback(text);
+                });
+            });
         }
 };
 
