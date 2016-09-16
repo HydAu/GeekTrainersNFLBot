@@ -191,18 +191,16 @@ var helper = function() {
                     }
                     let results = {};
                     results.playerComparisonThumbnails = thumbnails;
-                    results.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS). \n\n Let's see a more detailed breakdown."
+                    results.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS)."
                     callback(results);
                 });
             });
         },
         self.getStatComparisonFullResults = (session, firstPlayerChosen, secondPlayerChosen) => {
              self.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
-                let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-                text += response.text;
                 const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
                 session.send(message);
-                builder.Prompts.text(session, text);
+                builder.Prompts.text(session, response.text);
             });
         }
 };
