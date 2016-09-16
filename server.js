@@ -40,7 +40,7 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
             session.privateConversationData.wantsToCompare = false;
             const playerName = builder.EntityRecognizer.findEntity(args.entities, 'player');
             if (!playerName) {
-                 builder.Prompts.text(session, `Who are you looking for?\n\nYou can enter a player name, or his position.`);
+                builder.Prompts.text(session, `Who are you looking for?\n\nYou can enter a player name, or his position.`);
             } else {
                 next({ response: playerName.entity });
             }
@@ -119,7 +119,7 @@ bot.dialog('/stats', [
             params.stats = JSON.parse(response[0].stat);
             var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
             var message = new builder.Message(session).attachments([statThumbnail]);
-            session.send(`Here's his most recent week:`);            
+            session.send(`Here's his most recent week:`);
             session.send(message);
             session.send(`Let's look for someone else!`);
             session.replaceDialog('/', { message: { text: 'get stats' } });
@@ -193,14 +193,24 @@ bot.dialog('/comparePlayers', [
         } else {
             secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
         }
-        helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-            console.log("--------------------------------------------");
-            console.log(response);
-            let text  = `Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-            text += response.text;
-            builder.Prompts.text(session, text);
-            const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-            session.send(message);
-        });
+        let response = {};
+        response.secondPlayerChosen = secondPlayerChosen;
+        session.beginDialog('/showCompareResults', response)
     },
+]);
+bot.dialog('/showCompareResults', [
+    (session, results) => {
+        if (results.secondPlayerChosen) {
+            var secondPlayerChosen = results.secondPlayerChosen;
+            helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
+                let text = `Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
+                text += response.text;
+                builder.Prompts.text(session, text);
+                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+                session.send(message);
+            });
+        } else {
+            
+        }
+    }
 ]);
