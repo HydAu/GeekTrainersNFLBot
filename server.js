@@ -195,8 +195,7 @@ bot.dialog('/comparePlayers', [
         }
         builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
         helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-            console.log(response);
-            builder.Prompts.choice(session, response, ['See More Details', 'Next Week\'s Projections']);
+            builder.Prompts.text(session, response.text);
         });
     },
 ]);
