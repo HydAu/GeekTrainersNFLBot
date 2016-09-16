@@ -168,13 +168,13 @@ var helper = function () {
                     if (secondPlayerPoints < firstPlayerPoints) {
                         betterPlayer = session.privateConversationData.firstPlayerChosen.displayName;
                         worsePlayer = secondPlayerChosen.displayName;
-                        worsePoints = parseInt(secondPlayerPoints);
-                        betterPoints = parseInt(firstPlayerPoints);
+                        worsePoints = Math.round(secondPlayerPoints);
+                        betterPoints = Math.round(firstPlayerPoints);
                     } else {
                         betterPlayer = secondPlayerChosen.displayName;
                         worsePlayer = session.privateConversationData.firstPlayerChosen.displayName;
-                        worsePoints = parseInt(firstPlayerPoints);
-                        betterPoints = parseInt(secondPlayerPoints);
+                        worsePoints = Math.round(firstPlayerPoints);
+                        betterPoints = Math.round(secondPlayerPoints);
                     }
                     var text = betterPlayer + " (" + betterPoints + " FPTS) had a better week than " + worsePlayer + " (" + worsePoints + " FPTS)."
                     callback(text);
