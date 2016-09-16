@@ -32,7 +32,7 @@ var helper = function() {
                 // thumbnail.buttons([
                 //     new builder.CardAction.postBack(session, player.nflId, 'Select')
                 // ]);
-                // thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
+                thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
             } else {
                 // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
                 var urlPlayer = player.displayName.replace(' ', '').replace('-', '').toLowerCase();
@@ -132,9 +132,7 @@ var helper = function() {
             .attachments(thumbnails)
             .attachmentLayout('carousel');
         let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
-        // builder.Prompts.choice(session, message, prompts, { maxRetries: 0 });
-        session.send(message);
-        builder.Prompts.text('some string.');
+        builder.Prompts.choice(session, message, prompts, { maxRetries: 0 });
     }
 
     self.handlePlayerPromptResults = (session, results) => {
