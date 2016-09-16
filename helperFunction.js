@@ -31,11 +31,11 @@ var helper = function () {
             if (player.jerseyNumber) text += 'Jersey: ' + player.jerseyNumber + ' \n';
             thumbnail.text(text);
             if (requiresButton) {
-                thumbnail.buttons([
-                    new builder.CardAction.postBack(session, player.nflId, 'Select')
-                ]);
+                // thumbnail.buttons([
+                //     new builder.CardAction.postBack(session, player.nflId, 'Select')
+                // ]);
+                thumbnail.tap(new builder.CardAction.postBack(session, player.nflId));
             } else {
-
                 // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
                 var urlPlayer = player.displayName.replace(' ', '').replace('-', '').toLowerCase();
                 var url = 'http://www.nfl.com/player/' + urlPlayer + '/' + player.nflId + '/profile';
