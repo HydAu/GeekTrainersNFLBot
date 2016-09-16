@@ -1,3 +1,4 @@
+"use strict";
 const fs = require('fs');
 const sql = require('seriate');
 sql.setDefaultConfig({
@@ -29,11 +30,11 @@ fs.readFileSync('./predictions.tsv').toString().split('\r\n').forEach((line) => 
             params: {
                 currentPlayer: {
                     type: sql.NVARCHAR,
-                    val: currentPlayer
+                    val: JSON.stringify(currentPlayer)
                 },
                 displayName: {
                     type: sql.NVARCHAR,
-                    val: currentPlayer.name
+                    val: currentPlayer.Player
                 }
             }
         })
