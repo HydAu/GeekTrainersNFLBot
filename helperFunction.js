@@ -185,6 +185,9 @@ var helper = function () {
                     callback(text);
                 });
             });
+        },
+        self.checkForComparePlayers = function (session) {
+            return session.privateConversationData.firstPlayerLUISResponse || session.privateConversationData.firstPlayerLUISResponse;
         }
 };
 
