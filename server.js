@@ -61,7 +61,7 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
         (session, args) => {
             session.privateConversationData.wantsToCompare = true;
             const playerNames = builder.EntityRecognizer.findAllEntities(args.entities, 'player')
-            session.replaceDialog('/showCompareResults', playerNames);
+            session.replaceDialog('/showCompareResults', {playerNames: playerNames});
         }
 
     ]);
