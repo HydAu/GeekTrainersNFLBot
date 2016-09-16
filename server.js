@@ -196,8 +196,6 @@ bot.dialog('/comparePlayers', [
             secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
         }
         helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-            console.log("--------------------------------------------");
-            console.log(response);
             let text  = `Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
             text += response.text;
             builder.Prompts.text(session, text);
