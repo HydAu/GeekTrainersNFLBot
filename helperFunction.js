@@ -187,7 +187,7 @@ var helper = function () {
             });
         },
         self.checkForComparePlayers = function (session) {
-            return session.privateConversationData.firstPlayerLUISResponse || session.privateConversationData.firstPlayerLUISResponse;
+            return session.privateConversationData.wantsToCompare && session.privateConversationData.firstPlayerLUISResponse && session.privateConversationData.firstPlayerLUISResponse;
         }
 };
 
