@@ -26,7 +26,6 @@ server.post('/api/messages', connector.listen());
 const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
     .onDefault([
         (session, args, next) => {
-            console.log('here');
             session.send(`Hi there! I'm the NFL Fantasy bot. I can help you research players, or to figure out who to start next week.`);
             session.send(`Let's get started!`);
             builder.Prompts.choice(session, 'What would you like to do?', ['Get Player Stats']);
@@ -65,12 +64,18 @@ bot.dialog('/player', [
         session.sendTyping();
         azureSearch.getPlayers(playerName, (allPlayers) => {
             let firstPlayer = session.privateConversationData.firstPlayer = allPlayers.shift();
-            const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
-            const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
-            const message = new builder.Message(session).attachments([thumbnail]);
-            session.send(`I think this is who you're looking for:`)
-            session.send(message);
-            builder.Prompts.choice(session, 'Is this correct?', ['Yes', 'No']);
+            if (firstPlayer) {
+                const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
+                const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
+                const message = new builder.Message(session).attachments([thumbnail]);
+                session.send(`I think this is who you're looking for:`)
+                session.send(message);
+                builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+            } else {
+                session.send("Unable to find that player.");
+                session.endConversation();
+                session.replaceDialog("/"); // ('/', { message: { text: "get stats" } });
+            }
         });
     },
     (session, results, next) => {
