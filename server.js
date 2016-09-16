@@ -1,12 +1,11 @@
 const azureSearch = require('./azureSearch.js');
 const helper = require('./helperFunction.js');
-const teams = require('./teams.json')
+const teams = require('./teams.json');
 const restify = require('restify');
 const builder = require('botbuilder');
 const https = require('https');
 const querystring = require('querystring');
 const sql = require('./sql');
-const sessionHelper = require('./sessionHelper.js')
 
 
 const server = restify.createServer();
@@ -27,7 +26,10 @@ server.post('/api/messages', connector.listen());
 const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
     .onDefault([
         (session, args, next) => {
-            builder.Prompts.choice(session, 'What would you like to do?', ['Get Stats']);
+            console.log('here');
+            session.send(`Hi there! I'm the NFL Fantasy bot. I can help you research players, or to figure out who to start next week.`);
+            session.send(`Let's get started!`);
+            builder.Prompts.choice(session, 'What would you like to do?', ['Get Player Stats']);
         },
         (session, results, next) => {
             let response = results.response.entity.toLowerCase();
@@ -37,7 +39,7 @@ const dialog = new builder.IntentDialog( { recognizers: [recognizer] })
         (session, args, next) => {
             const playerName =  builder.EntityRecognizer.findEntity(args.entities, 'player');
             if (!playerName) {
-                 builder.Prompts.text(session, 'Enter a Player Name or Position');
+                 builder.Prompts.text(session, `Who are you looking for?\n\nYou can enter a player name, or his position.`);
             } else {
                 next( { response: playerName.entity } );
             }
@@ -66,8 +68,9 @@ bot.dialog('/player', [
             const thumbnail = helper.getPlayerThumbnail(session, firstPlayer, false);
             const playerRecommendations = session.privateConversationData.playerRecommendations = allPlayers;
             const message = new builder.Message(session).attachments([thumbnail]);
+            session.send(`I think this is who you're looking for:`)
             session.send(message);
-            builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+            builder.Prompts.choice(session, 'Is this correct?', ['Yes', 'No']);
         });
     },
     (session, results, next) => {
@@ -87,24 +90,28 @@ bot.dialog('/player', [
 
 bot.dialog('/stats', [
     (session, results) => {
+        session.send(`Let me go get his most recent stats...`);
         sql.getPlayerStats(session.privateConversationData.currentPlayer.nflId, function (response) {
             var params = {}
             params.otherstats = response[0];
             params.stats = JSON.parse(response[0].stat);
             var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
             var message = new builder.Message(session).attachments([statThumbnail]);
+            session.send(`Here's his most recent week:`);            
             session.send(message);
-            session.endConversation();
+            session.send(`Let's look for someone else!`);
+            session.replaceDialog('/', { message: { text: 'get stats' } });
         });
     }
 ])
 
 bot.dialog('/position', [
     (session, results) => { // "What Position does this player play?" // ShowTeams
+        session.send('Here is a list of NFL teams.')
         const teamThumbnails = helper.getTeamThumbnails(session, teams);
         const message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
         session.send(message);
-        builder.Prompts.text(session, 'Type your team name');
+        builder.Prompts.text(session, `If you type the name, I can load all of the ${session.privateConversationData.position}s for that team.`);
     },
     (session, results) => { // Get potential players from teamname/position
         const teamChosen = session.privateConversationData.teamChosen = results.response;

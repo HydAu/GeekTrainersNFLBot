@@ -16,7 +16,7 @@ var helper = function () {
         return thumbnail;
     };
 
-    self.getPlayerThumbnail = (session, player, button) => {
+    self.getPlayerThumbnail = (session, player, requiresButton) => {
         try {
             var thumbnail = new builder.ThumbnailCard(session);
             thumbnail.title(player.displayName);
@@ -29,7 +29,7 @@ var helper = function () {
             if (player.yearsOfExperience) text += 'Years in league: ' + player.yearsOfExperience + ' \n';
             if (player.jerseyNumber) text += 'Jersey: ' + player.jerseyNumber + ' \n';
             thumbnail.text(text);
-            if (button) {
+            if (requiresButton) {
                 thumbnail.buttons([
                     new builder.CardAction.postBack(session, player.nflId, 'Select')
                 ]);
@@ -90,23 +90,23 @@ var helper = function () {
         thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
         if (player.otherstats.position == 'QB') {
             text += `Passing: ${player.stats.passing.completions}/${player.stats.passing.attempts},
-            Yards: ${player.stats.passing.yards}\n
-            Touchdowns: ${player.stats.passing.touchdowns}\n
-            Interceptions: ${player.stats.passing.interceptions}\n `;
+            Yards: ${player.stats.passing.yards}\n\n
+            TDs: ${player.stats.passing.touchdowns}\n\n
+            INTs: ${player.stats.passing.interceptions}`;
         }
         if (player.otherstats.position == 'QB' || player.otherstats.position == 'TE' || player.otherstats.position == 'WR' || player.otherstats.position == 'RB') {
             text += `
-                Carries: ${player.stats.rushing.carries},
-                Yards: ${player.stats.rushing.yards},
-                Touchdowns: ${player.stats.rushing.touchdowns},
-                Fumbles Lost: ${player.stats.rushing.fumblesLost}`;
+                Carries: ${player.stats.rushing.carries},\n\n
+                Yards: ${player.stats.rushing.yards},\n\n
+                TDs: ${player.stats.rushing.touchdowns},\n\n
+                Fumbles: ${player.stats.rushing.fumblesLost}`;
         }
         if (player.otherstats.position == 'RB' || player.otherstats.position == 'TE' || player.otherstats.position == 'WR') {
             text += `
-                 Catches: ${player.stats.receiving.catches},
-                  Yards: ${player.stats.receiving.yards},
-                  Touchdowns: ${player.stats.receiving.touchdowns}, 
-                  Fumbles Lost: ${player.stats.receiving.fumblesLost}`
+                 Catches: ${player.stats.receiving.catches},\n\n
+                  Yards: ${player.stats.receiving.yards},\n\n
+                  TDs: ${player.stats.receiving.touchdowns},\n\n 
+                  Fumbles: ${player.stats.receiving.fumblesLost}`
         }
 
         thumbnail.text(text);
@@ -123,6 +123,8 @@ var helper = function () {
     }
 
     self.sendPlayerPrompts = (session, players) => {
+        session.send(`Here are all of the players I found that match your query.\n\nYou can click select on the one that you're looking for.`);
+        session.send(`If none of them match, you can try your query again.`);
         const thumbnails = players.map(player => self.getPlayerThumbnail(session, player, true));
         let message = new builder
             .Message(session)
@@ -135,13 +137,15 @@ var helper = function () {
     self.handlePlayerPromptResults = (session, results) => {
         console.log(session.message);
         if (!results.response) {
-            session.send('So sorry. Do not know that one. Beginning search for: ' + session.message.text);
+            session.send(`I'm sorry I'm not sure who you're looking for there.`);
+            session.send('Let me start a search for  ' + session.message.text + ' for you.');
             session.replaceDialog('/', { message: { text: session.message.text } });
         } else if (session.privateConversationData.playerPrompts[results.response.entity]) {
             session.privateConversationData.currentPlayer = session.privateConversationData.playerPrompts[results.response.entity];
             session.beginDialog('/stats');
         } else {
-            session.send('So sorry. Do not know that one.');
+            session.send(`I'm sorry. I'm not sure who you're looking for there.`);
+            session.send(`Let's try this again.`);
             session.replaceDialog('/', { message: { text: results.response } });
         }
     }
