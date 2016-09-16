@@ -1,6 +1,6 @@
 const https = require('https');
 const builder = require('botbuilder');
-
+var sql = require('./sql.js');
 var helper = function () {
     let self = this;
 
@@ -129,7 +129,7 @@ var helper = function () {
             .attachments(thumbnails)
             .attachmentLayout('carousel');
         let prompts = session.privateConversationData.playerPrompts = self.convertPlayerArrayToPlayerPrompts(players);
-        builder.Prompts.choice(session, message, prompts, { maxRetries: 0});
+        builder.Prompts.choice(session, message, prompts, { maxRetries: 0 });
     }
 
     self.handlePlayerPromptResults = (session, results) => {
@@ -145,16 +145,38 @@ var helper = function () {
             session.replaceDialog('/', { message: { text: results.response } });
         }
     },
-    self.getPlayerScoreForComparison = (nflID) => {
-        sql.getPlayerStats(nflID, function (response) {
-            var params = {}
-            params.otherstats = response[0];
-            params.stats = JSON.parse(response[0].stat);
-            firstPlayerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) +
-                (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumbles * (-2)) +
-                (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumbles * (-2))
-        });
-    }
+        self.getPlayerScoreForComparison = (nflID) => {
+            sql.getPlayerStats(nflID, function (response) {
+                var params = {}
+                params.otherstats = response[0];
+                params.stats = JSON.parse(response[0].stat);
+                console.log(params.stats.passing.yards * .04);
+                var firstPlayerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
+                console.log(firstPlayerPoints);
+                return firstPlayerPoints;
+            });
+        },
+        self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen) => {
+            let secondPlayerPoints = self.getPlayerScoreForComparison(secondNFLID);
+            let firstPlayerPoints = self.getPlayerScoreForComparison(firstNFLID);
+            let text;
+            let betterPlayer;
+            let worsePlayer;
+            let betterPoints;
+            let worsePoints
+            if (secondPlayerPoints < firstPlayerPoints) {
+                betterPlayer = session.privateConversationData.firstPlayerChosen;
+                worsePlayer = secondPlayerChosen;
+                worsePoints = secondPlayerPoints;
+                betterPoints = firstPlayerPoints;
+            } else {
+                betterPlayer = secondPlayerChosen;
+                worsePlayer = session.privateConversationData.firstPlayerChosen;
+                worsePoints = firstPlayerPoints;
+                betterPoints = secondPlayerPoints;
+            }
+            return betterPlayer.displayName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayer.displayName + " (" + worsePoints + " FPTS)."
+        }
 };
 
 module.exports = new helper();
