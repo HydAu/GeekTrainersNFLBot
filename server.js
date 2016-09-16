@@ -156,13 +156,7 @@ bot.dialog('/comparePlayers', [
     (session, results) => {
         let firstPlayerChosen;
         if (results.response.entity === 'Yes') {
-            if(session.privateConversationData.firstPlayerChosen){
-                console.log('here1')
-                session.privateConversationData.secondPlayerChosen = session.privateConversationData.firstPlayer
-            } else {
-                console.log('here')
-                firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.firstPlayer;
-            }
+            firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.firstPlayer;
         } else {
             firstPlayerChosen = session.privateConversationData.firstPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
         }
@@ -180,7 +174,12 @@ bot.dialog('/comparePlayers', [
         });
     },
     (session, results) => {
-        let secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
+        let secondPlayerChosen;
+        if (results.response.entity === 'Yes') {
+            secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.firstPlayer;
+        } else {
+            secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
+        }
         builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
     },
 ]);
