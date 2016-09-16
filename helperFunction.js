@@ -150,14 +150,16 @@ var helper = function() {
             session.replaceDialog('/', { message: { text: results.response } });
         }
     },
-        self.getPlayerScoreForComparison = (nflID, callback) => {
+        self.getPlayerScoreForComparison = (session, nflID, callback) => {
             sql.getPlayerStats(nflID, function(response) {
                 var params = {}
                 params.otherstats = response[0];
                 params.stats = JSON.parse(response[0].stat);
                 let results = {};
-                results.thumbnail = getPlayerStatsThumbnail(params);
+                console.log(params)
+                results.thumbnail = self.getPlayerStatsThumbnail(session, params);
                 results.playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
+                console.log(results);
                 callback(results);
             });
         },
@@ -169,8 +171,8 @@ var helper = function() {
             let betterPoints;
             let worsePoints;
             let thumbnails = [];
-            self.getPlayerScoreForComparison(firstNFLID, (response) => {
-                self.getPlayerScoreForComparison(secondNFLID, (secondResponse) => {
+            self.getPlayerScoreForComparison(session, firstNFLID, (response) => {
+                self.getPlayerScoreForComparison(session, secondNFLID, (secondResponse) => {
                     firstPlayerPoints = response.playerPoints;
                     secondPlayerPoints = secondResponse.playerPoints;
                     if (secondPlayerPoints < firstPlayerPoints) {
