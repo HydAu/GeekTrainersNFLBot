@@ -61,7 +61,7 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
         (session, args) => {
             session.privateConversationData.wantsToCompare = true;
             const playerNames = builder.EntityRecognizer.findAllEntities(args.entities, 'player')
-            session.replaceDialog('/showCompareResults', {playerNames: playerNames});
+            session.beginDialog('/showCompareResults', { playerNames: playerNames });
         }
 
     ]);
@@ -202,24 +202,19 @@ bot.dialog('/comparePlayers', [
 ]);
 bot.dialog('/showCompareResults', [
     (session, results) => {
-        if (results.secondPlayerChosen) {
+        if (!results) {
+            session.send("I'm sorry, I don't understand what you mean.");
+        } else if (results.secondPlayerChosen) {
+            var firstPlayerChosen = session.privateConversationData.firstPlayerChosen;
             var secondPlayerChosen = results.secondPlayerChosen;
-            helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-                let text = `Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-                text += response.text;
-                builder.Prompts.text(session, text);
-                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-                session.send(message);
-            });
+            helper.getStatComparisonFullResults(session, firstPlayerChosen, secondPlayerChosen);
         } else {
-            var firstPlayerChosen = results.playerNames[0];
-            var secondPlayerChosen = results.playerNames[1];
-            helper.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-                let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-                text += response.text;
-                builder.Prompts.text(session, text);
-                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-                session.send(message);
+            sql.getPlayerData(results.playerNames[0].entity, (result) => {
+                sql.getPlayerData(results.playerNames[1].entity, (response) => {
+                    var firstPlayerChosen = result;
+                    var secondPlayerChosen = response;
+                    helper.getStatComparisonFullResults(session, firstPlayerChosen, secondPlayerChosen);
+                });
             });
         }
     }
