@@ -2,7 +2,7 @@
 const https = require('https');
 const builder = require('botbuilder');
 var sql = require('./sql.js');
-var helper = function () {
+var helper = function() {
     let self = this;
 
     self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
@@ -54,10 +54,10 @@ var helper = function () {
             path: path,
             method: 'GET'
         };
-        var request = https.request(options, function (response) {
+        var request = https.request(options, function(response) {
             var data = '';
-            response.on('data', function (chunk) { data += chunk; });
-            response.on('end', function () {
+            response.on('data', function(chunk) { data += chunk; });
+            response.on('end', function() {
                 callback(JSON.parse(data));
             });
         });
@@ -151,12 +151,14 @@ var helper = function () {
         }
     },
         self.getPlayerScoreForComparison = (nflID, callback) => {
-            sql.getPlayerStats(nflID, function (response) {
+            sql.getPlayerStats(nflID, function(response) {
                 var params = {}
                 params.otherstats = response[0];
                 params.stats = JSON.parse(response[0].stat);
-                var playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
-                callback(playerPoints);
+                let results = {};
+                results.thumbnail = getPlayerStatsThumbnail(params);
+                results.playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
+                callback(results);
             });
         },
         self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen, callback) => {
@@ -165,23 +167,29 @@ var helper = function () {
             let betterPlayerName;
             let worsePlayerName;
             let betterPoints;
-            let worsePoints
+            let worsePoints;
+            let thumbnails = [];
             self.getPlayerScoreForComparison(firstNFLID, (response) => {
                 self.getPlayerScoreForComparison(secondNFLID, (secondResponse) => {
-                    firstPlayerPoints = response;
-                    secondPlayerPoints =  secondResponse;
+                    firstPlayerPoints = response.playerPoints;
+                    secondPlayerPoints = secondResponse.playerPoints;
                     if (secondPlayerPoints < firstPlayerPoints) {
                         betterPlayerName = session.privateConversationData.firstPlayerChosen.displayName;
                         worsePlayerName = secondPlayerChosen.displayName;
                         worsePoints = Math.round(secondPlayerPoints);
                         betterPoints = Math.round(firstPlayerPoints);
+                        thumbnails.push(response.thumbnail);
+                        thumbnails.push(secondResponse.thumbnail);
                     } else {
                         betterPlayerName = secondPlayerChosen.displayName;
                         worsePlayerName = session.privateConversationData.firstPlayerChosen.displayName;
                         worsePoints = Math.round(firstPlayerPoints);
                         betterPoints = Math.round(secondPlayerPoints);
+                        thumbnails.push(secondResponse.thumbnail);
+                        thumbnails.push(response.thumbnail);
                     }
-                    let results = {}
+                    let results = {};
+                    results.playerComparisonThumbnails = thumbnails;
                     results.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS). \n\n Let's see a more detailed breakdown."
                     callback(results);
                 });
