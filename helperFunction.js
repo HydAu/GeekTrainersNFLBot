@@ -158,7 +158,7 @@ var helper = function() {
                 callback(results);
             });
         },
-        self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen, callback) => {
+        self.getBestPlayer = (session, firstNFLID, secondNFLID, firstPlayerChosen, secondPlayerChosen, callback) => {
             let secondPlayerPoints;
             let firstPlayerPoints;
             let betterPlayerName;
@@ -171,7 +171,7 @@ var helper = function() {
                     firstPlayerPoints = response.playerPoints;
                     secondPlayerPoints = secondResponse.playerPoints;
                     if (secondPlayerPoints < firstPlayerPoints) {
-                        betterPlayerName = session.privateConversationData.firstPlayerChosen.displayName;
+                        betterPlayerName = firstPlayerChosen.displayName;
                         worsePlayerName = secondPlayerChosen.displayName;
                         worsePoints = Math.round(secondPlayerPoints);
                         betterPoints = Math.round(firstPlayerPoints);
@@ -179,7 +179,7 @@ var helper = function() {
                         thumbnails.push(secondResponse.thumbnail);
                     } else {
                         betterPlayerName = secondPlayerChosen.displayName;
-                        worsePlayerName = session.privateConversationData.firstPlayerChosen.displayName;
+                        worsePlayerName = firstPlayerChosen.displayName;
                         worsePoints = Math.round(firstPlayerPoints);
                         betterPoints = Math.round(secondPlayerPoints);
                         thumbnails.push(secondResponse.thumbnail);
@@ -192,8 +192,14 @@ var helper = function() {
                 });
             });
         },
-        self.checkForComparePlayers = function (session) {
-            return session.privateConversationData.wantsToCompare && session.privateConversationData.firstPlayerLUISResponse && session.privateConversationData.firstPlayerLUISResponse;
+        self.getStatComparisonFullResults = (session, firstPlayerChosen, secondPlayerChosen) => {
+             self.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
+                let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
+                text += response.text;
+                builder.Prompts.text(session, text);
+                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+                session.send(message);
+            });
         }
 };
 

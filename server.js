@@ -203,14 +203,9 @@ bot.dialog('/comparePlayers', [
 bot.dialog('/showCompareResults', [
     (session, results) => {
         if (results.secondPlayerChosen) {
+            var firstPlayerChosen = session.privateConversationData.firstPlayerChosen;
             var secondPlayerChosen = results.secondPlayerChosen;
-            helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-                let text = `Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-                text += response.text;
-                builder.Prompts.text(session, text);
-                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-                session.send(message);
-            });
+            helper.getStatComparisonFullResults(session, firstPlayerChosen, secondPlayerChosen);
         } else {
             sql.getPlayerData(results.playerNames[0], (result) => {
                 var firstPlayerChosen = result;
