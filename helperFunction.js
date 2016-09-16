@@ -34,7 +34,7 @@ var helper = function () {
                 // thumbnail.buttons([
                 //     new builder.CardAction.postBack(session, player.nflId, 'Select')
                 // ]);
-                thumbnail.tap(new builder.CardAction.postBack(session, player.nflId));
+                thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
             } else {
                 // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
                 var urlPlayer = player.displayName.replace(' ', '').replace('-', '').toLowerCase();
