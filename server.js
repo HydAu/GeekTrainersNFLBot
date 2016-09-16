@@ -57,7 +57,7 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
             });
         }
     ])
-    .matches(/^compare ?players$/i, [
+    .matches('ComparePlayer', [
         (session, args) => {
             session.privateConversationData.wantsToCompare = true;
             session.replaceDialog('/comparePlayers');
