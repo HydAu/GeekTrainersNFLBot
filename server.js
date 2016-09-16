@@ -1,3 +1,4 @@
+"use strict";
 const azureSearch = require('./azureSearch.js');
 const helper = require('./helperFunction.js');
 const teams = require('./teams.json');

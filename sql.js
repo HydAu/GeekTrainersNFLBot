@@ -1,3 +1,4 @@
+"use strict";
 var wrapper = function () {
     var self = this;
     self.sql = require('seriate');
