@@ -171,18 +171,20 @@ var helper = function () {
                     firstPlayerPoints = response;
                     secondPlayerPoints =  secondResponse;
                     if (secondPlayerPoints < firstPlayerPoints) {
-                        betterPlayer = session.privateConversationData.firstPlayerChosen.displayName;
-                        worsePlayer = secondPlayerChosen.displayName;
+                        betterPlayerName = session.privateConversationData.firstPlayerChosen.displayName;
+                        worsePlayerName = secondPlayerChosen.displayName;
                         worsePoints = Math.round(secondPlayerPoints);
                         betterPoints = Math.round(firstPlayerPoints);
                     } else {
-                        betterPlayer = secondPlayerChosen.displayName;
-                        worsePlayer = session.privateConversationData.firstPlayerChosen.displayName;
+                        betterPlayerName = secondPlayerChosen.displayName;
+                        worsePlayerName = session.privateConversationData.firstPlayerChosen.displayName;
                         worsePoints = Math.round(firstPlayerPoints);
                         betterPoints = Math.round(secondPlayerPoints);
                     }
-                    var text = betterPlayer + " (" + betterPoints + " FPTS) had a better week than " + worsePlayer + " (" + worsePoints + " FPTS)."
-                    callback(text);
+                    let response = {}
+                    response.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS). \n\n Let's see a more detailed breakdown."
+                    
+                    callback(response);
                 });
             });
         }
