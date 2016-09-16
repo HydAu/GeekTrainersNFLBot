@@ -158,7 +158,7 @@ var helper = function() {
                 callback(results);
             });
         },
-        self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen, callback) => {
+        self.getBestPlayer = (session, firstNFLID, secondNFLID, firstPlayerChosen, secondPlayerChosen, callback) => {
             let secondPlayerPoints;
             let firstPlayerPoints;
             let betterPlayerName;
@@ -171,7 +171,7 @@ var helper = function() {
                     firstPlayerPoints = response.playerPoints;
                     secondPlayerPoints = secondResponse.playerPoints;
                     if (secondPlayerPoints < firstPlayerPoints) {
-                        betterPlayerName = session.privateConversationData.firstPlayerChosen.displayName;
+                        betterPlayerName = firstPlayerChosen.displayName;
                         worsePlayerName = secondPlayerChosen.displayName;
                         worsePoints = Math.round(secondPlayerPoints);
                         betterPoints = Math.round(firstPlayerPoints);
@@ -179,7 +179,7 @@ var helper = function() {
                         thumbnails.push(secondResponse.thumbnail);
                     } else {
                         betterPlayerName = secondPlayerChosen.displayName;
-                        worsePlayerName = session.privateConversationData.firstPlayerChosen.displayName;
+                        worsePlayerName = firstPlayerChosen.displayName;
                         worsePoints = Math.round(firstPlayerPoints);
                         betterPoints = Math.round(secondPlayerPoints);
                         thumbnails.push(secondResponse.thumbnail);
