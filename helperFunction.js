@@ -191,7 +191,7 @@ var helper = function() {
                     callback(results);
                 });
             });
-        }
+        },
         self.getStatComparisonFullResults = (session, firstPlayerChosen, secondPlayerChosen) => {
              self.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
                 let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';

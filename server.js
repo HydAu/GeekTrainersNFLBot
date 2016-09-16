@@ -203,7 +203,7 @@ bot.dialog('/showCompareResults', [
         if (results.secondPlayerChosen) {
             var firstPlayerChosen = session.privateConversationData.firstPlayerChosen;
             var secondPlayerChosen = results.secondPlayerChosen;
-            helper.getStatComparisonFullResult(session, firstPlayerChosen, secondPlayerChosen);
+            helper.getStatComparisonFullResults(session, firstPlayerChosen, secondPlayerChosen);
             // helper.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
             //     let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
             //     text += response.text;
