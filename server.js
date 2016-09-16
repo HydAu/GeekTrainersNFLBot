@@ -57,10 +57,11 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
             });
         }
     ])
-    .matches(/^compare ?players$/i, [
+    .matches('ComparePlayer', [
         (session, args) => {
             session.privateConversationData.wantsToCompare = true;
-            session.replaceDialog('/comparePlayers');
+            const playerNames = builder.EntityRecognizer.findAllEntities(args.entities, 'player')
+            session.replaceDialog('/showCompareResults', playerNames);
         }
 
     ]);
@@ -151,6 +152,7 @@ bot.dialog('/position', [
         }
     }
 ]);
+
 bot.dialog('/comparePlayers', [
     (session) => {
         builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
@@ -193,10 +195,21 @@ bot.dialog('/comparePlayers', [
         } else {
             secondPlayerChosen = session.privateConversationData.secondPlayerChosen = session.privateConversationData.playerPrompts[results.response.entity];
         }
-        builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
         helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-            console.log(response);
-            builder.Prompts.choice(session, response, ['See More Details', 'Next Week\'s Projections']);
+            let text  = `Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
+            text += response.text;
+            builder.Prompts.text(session, text);
+            const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+            session.send(message);
         });
     },
+]);
+
+bot.dialog('/showCompareResults', [
+    (session, results) => {
+        console.log(session, results);
+        helper.getBestPlayer(session, results[0], (response) => {
+            builder.Prompts.choice(session, response, ['See More Details', 'Next Week\'s Projections']);
+        });
+    }
 ]);

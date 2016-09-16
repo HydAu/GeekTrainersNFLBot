@@ -2,18 +2,16 @@
 const https = require('https');
 const builder = require('botbuilder');
 var sql = require('./sql.js');
-var helper = function () {
+var helper = function() {
     let self = this;
 
     self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
 
     self.getCurrentTeamThumbnail = (session, team) => {
-        console.log(team)
         var thumbnail = new builder.ThumbnailCard(session);
         thumbnail.title(team.teamname);
         var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + team.abbr + '/' + team.abbr + '_logo-80x90.gif';
         thumbnail.images([builder.CardImage.create(session, imageUrl)])
-        // console.log(thumbnail)
         return thumbnail;
     };
 
@@ -34,7 +32,7 @@ var helper = function () {
                 // thumbnail.buttons([
                 //     new builder.CardAction.postBack(session, player.nflId, 'Select')
                 // ]);
-                thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
+                // thumbnail.tap(new builder.CardAction.imBack(session, player.nflId));
             } else {
                 // thumbnail.tap(new builder.CardAction.openUrl(session, player.html_url));
                 var urlPlayer = player.displayName.replace(' ', '').replace('-', '').toLowerCase();
@@ -54,10 +52,10 @@ var helper = function () {
             path: path,
             method: 'GET'
         };
-        var request = https.request(options, function (response) {
+        var request = https.request(options, function(response) {
             var data = '';
-            response.on('data', function (chunk) { data += chunk; });
-            response.on('end', function () {
+            response.on('data', function(chunk) { data += chunk; });
+            response.on('end', function() {
                 callback(JSON.parse(data));
             });
         });
@@ -86,7 +84,7 @@ var helper = function () {
 
     self.getPlayerStatsThumbnail = (session, player) => {
         var thumbnail = new builder.ThumbnailCard(session);
-        var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
+        var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.otherstats.esbId + '.png '
         thumbnail.images([builder.CardImage.create(session, imageUrl)]);
         var text = '';
         thumbnail.title(player.otherstats.displayName)
@@ -138,7 +136,6 @@ var helper = function () {
     }
 
     self.handlePlayerPromptResults = (session, results) => {
-        console.log(session.message);
         if (!results.response) {
             session.send(`I'm sorry I'm not sure who you're looking for there.`);
             session.send('Let me start a search for  ' + session.message.text + ' for you.');
@@ -152,41 +149,53 @@ var helper = function () {
             session.replaceDialog('/', { message: { text: results.response } });
         }
     },
-        self.getPlayerScoreForComparison = (nflID, callback) => {
-            sql.getPlayerStats(nflID, function (response) {
+        self.getPlayerScoreForComparison = (session, nflID, callback) => {
+            sql.getPlayerStats(nflID, function(response) {
                 var params = {}
                 params.otherstats = response[0];
                 params.stats = JSON.parse(response[0].stat);
-                var playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
-                callback(playerPoints);
+                let results = {};
+                results.thumbnail = self.getPlayerStatsThumbnail(session, params);
+                results.playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
+                callback(results);
             });
         },
         self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen, callback) => {
             let secondPlayerPoints;
             let firstPlayerPoints;
-            let betterPlayer;
-            let worsePlayer;
+            let betterPlayerName;
+            let worsePlayerName;
             let betterPoints;
-            let worsePoints
-            self.getPlayerScoreForComparison(firstNFLID, (response) => {
-                self.getPlayerScoreForComparison(secondNFLID, (secondResponse) => {
-                    firstPlayerPoints = response;
-                    secondPlayerPoints = secondResponse;
+            let worsePoints;
+            let thumbnails = [];
+            self.getPlayerScoreForComparison(session, firstNFLID, (response) => {
+                self.getPlayerScoreForComparison(session, secondNFLID, (secondResponse) => {
+                    firstPlayerPoints = response.playerPoints;
+                    secondPlayerPoints = secondResponse.playerPoints;
                     if (secondPlayerPoints < firstPlayerPoints) {
-                        betterPlayer = session.privateConversationData.firstPlayerChosen.displayName;
-                        worsePlayer = secondPlayerChosen.displayName;
+                        betterPlayerName = session.privateConversationData.firstPlayerChosen.displayName;
+                        worsePlayerName = secondPlayerChosen.displayName;
                         worsePoints = Math.round(secondPlayerPoints);
                         betterPoints = Math.round(firstPlayerPoints);
+                        thumbnails.push(response.thumbnail);
+                        thumbnails.push(secondResponse.thumbnail);
                     } else {
-                        betterPlayer = secondPlayerChosen.displayName;
-                        worsePlayer = session.privateConversationData.firstPlayerChosen.displayName;
+                        betterPlayerName = secondPlayerChosen.displayName;
+                        worsePlayerName = session.privateConversationData.firstPlayerChosen.displayName;
                         worsePoints = Math.round(firstPlayerPoints);
                         betterPoints = Math.round(secondPlayerPoints);
+                        thumbnails.push(secondResponse.thumbnail);
+                        thumbnails.push(response.thumbnail);
                     }
-                    var text = betterPlayer + " (" + betterPoints + " FPTS) had a better week than " + worsePlayer + " (" + worsePoints + " FPTS)."
-                    callback(text);
+                    let results = {};
+                    results.playerComparisonThumbnails = thumbnails;
+                    results.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS). \n\n Let's see a more detailed breakdown."
+                    callback(results);
                 });
             });
+        },
+        self.checkForComparePlayers = function (session) {
+            return session.privateConversationData.wantsToCompare && session.privateConversationData.firstPlayerLUISResponse && session.privateConversationData.firstPlayerLUISResponse;
         }
 };
 
