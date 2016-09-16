@@ -162,8 +162,8 @@ var helper = function () {
         self.getBestPlayer = (session, firstNFLID, secondNFLID, secondPlayerChosen, callback) => {
             let secondPlayerPoints;
             let firstPlayerPoints;
-            let betterPlayer;
-            let worsePlayer;
+            let betterPlayerName;
+            let worsePlayerName;
             let betterPoints;
             let worsePoints
             self.getPlayerScoreForComparison(firstNFLID, (response) => {
@@ -181,10 +181,9 @@ var helper = function () {
                         worsePoints = Math.round(firstPlayerPoints);
                         betterPoints = Math.round(secondPlayerPoints);
                     }
-                    let response = {}
-                    response.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS). \n\n Let's see a more detailed breakdown."
-                    
-                    callback(response);
+                    let results = {}
+                    results.text = betterPlayerName + " (" + betterPoints + " FPTS) had a better week than " + worsePlayerName + " (" + worsePoints + " FPTS). \n\n Let's see a more detailed breakdown."
+                    callback(results);
                 });
             });
         }
