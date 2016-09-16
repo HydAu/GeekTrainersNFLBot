@@ -60,6 +60,9 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
     .matches('ComparePlayer', [
         (session, args) => {
             session.privateConversationData.wantsToCompare = true;
+            const playerNames = builder.EntityRecognizer.findAllEntities(args.entities, 'player')
+            session.privateConversationData.firstPlayerLUISResponse = playerNames[0];
+            session.privateConversationData.secondPlayerLUISResponse = playerNames[1];
             session.replaceDialog('/comparePlayers');
         }
 
@@ -153,7 +156,11 @@ bot.dialog('/position', [
 ]);
 bot.dialog('/comparePlayers', [
     (session) => {
-        builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
+        if (helper.checkForComparePlayers(session)) {
+            console.log("here");
+        } else {
+            builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
+        }
     },
     (session, results) => {
         azureSearch.getPosition(results.response, (position) => {
