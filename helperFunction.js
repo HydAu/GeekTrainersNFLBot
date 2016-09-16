@@ -144,6 +144,16 @@ var helper = function () {
             session.send('So sorry. Do not know that one.');
             session.replaceDialog('/', { message: { text: results.response } });
         }
+    },
+    self.getPlayerScoreForComparison = (nflID) => {
+        sql.getPlayerStats(nflID, function (response) {
+            var params = {}
+            params.otherstats = response[0];
+            params.stats = JSON.parse(response[0].stat);
+            firstPlayerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) +
+                (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumbles * (-2)) +
+                (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumbles * (-2))
+        });
     }
 };
 
