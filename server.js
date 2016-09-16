@@ -212,15 +212,21 @@ bot.dialog('/showCompareResults', [
                 session.send(message);
             });
         } else {
-            var firstPlayerChosen = results.playerNames[0];
-            var secondPlayerChosen = results.playerNames[1];
-            helper.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-                let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-                text += response.text;
-                builder.Prompts.text(session, text);
-                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-                session.send(message);
+            sql.getPlayerData(results.playerNames[0], (result) => {
+                var firstPlayerChosen = result;
+                sql.getPlayerData(results.playerNames[0], (result) => {
+                    var secondPlayerChosen = result;
+                    helper.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
+                        let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
+                        text += response.text;
+                        builder.Prompts.text(session, text);
+                        const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+                        session.send(message);
+                    });
+                });    
             });
+            
+            
         }
     }
 ]);
