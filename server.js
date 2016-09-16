@@ -204,13 +204,6 @@ bot.dialog('/showCompareResults', [
             var firstPlayerChosen = session.privateConversationData.firstPlayerChosen;
             var secondPlayerChosen = results.secondPlayerChosen;
             helper.getStatComparisonFullResults(session, firstPlayerChosen, secondPlayerChosen);
-            // helper.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
-            //     let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
-            //     text += response.text;
-            //     builder.Prompts.text(session, text);
-            //     const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-            //     session.send(message);
-            // });
         } else {
             
         }
