@@ -192,6 +192,15 @@ var helper = function() {
                 });
             });
         }
+        self.getStatComparisonFullResults = (session, firstPlayerChosen, secondPlayerChosen) => {
+             self.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
+                let text = `Let's compare  ` + firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName + '\n\n';
+                text += response.text;
+                builder.Prompts.text(session, text);
+                const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+                session.send(message);
+            });
+        }
 };
 
 module.exports = new helper();
