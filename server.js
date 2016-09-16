@@ -61,9 +61,7 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
         (session, args) => {
             session.privateConversationData.wantsToCompare = true;
             const playerNames = builder.EntityRecognizer.findAllEntities(args.entities, 'player')
-            session.privateConversationData.firstPlayerLUISResponse = playerNames[0];
-            session.privateConversationData.secondPlayerLUISResponse = playerNames[1];
-            session.replaceDialog('/comparePlayers');
+            session.replaceDialog('/showCompareResults', playerNames);
         }
 
     ]);
@@ -157,11 +155,7 @@ bot.dialog('/position', [
 
 bot.dialog('/comparePlayers', [
     (session) => {
-        if (helper.checkForComparePlayers(session)) {
-            console.log("here");
-        } else {
-            builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
-        }
+        builder.Prompts.text(session, `Let's find the first player you're looking for... \n\n Enter a Player Name or Position`);
     },
     (session, results) => {
         azureSearch.getPosition(results.response, (position) => {
@@ -194,9 +188,6 @@ bot.dialog('/comparePlayers', [
             }
         });
     },
-]);
-
-bot.dialog('/showCompareResults', [
     (session, results) => {
         let secondPlayerChosen;
         if (results.response.entity === 'Yes') {
@@ -206,8 +197,16 @@ bot.dialog('/showCompareResults', [
         }
         builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
         helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
-            console.log(response);
             builder.Prompts.choice(session, response, ['See More Details', 'Next Week\'s Projections']);
         });
     },
+]);
+
+bot.dialog('/showCompareResults', [
+    (session, results) => {
+        console.log(session, results);
+        helper.getBestPlayer(session, results[0], (response) => {
+            builder.Prompts.choice(session, response, ['See More Details', 'Next Week\'s Projections']);
+        });
+    }
 ]);
