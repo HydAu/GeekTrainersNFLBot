@@ -198,8 +198,8 @@ bot.dialog('/comparePlayers', [
             console.log("--------------------------------------------");
             console.log(response);
             builder.Prompts.text(session, response.text);
-            // const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-            // session.send(message);
+            const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+            session.send(message);
         });
     },
 ]);
