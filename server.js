@@ -29,7 +29,7 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
         (session, args, next) => {
             session.send(`Hi there! I'm the NFL Fantasy bot. I can help you research players, or to figure out who to start next week.`);
             session.send(`Let's get started!`);
-            builder.Prompts.choice(session, 'What would you like to do?', ['Get Player Stats']);
+            builder.Prompts.choice(session, 'What would you like to do?', ['Get Player Stats', 'Compare Players']);
         },
         (session, results, next) => {
             let response = results.response.entity.toLowerCase();
@@ -133,7 +133,8 @@ bot.dialog('/position', [
         const teamThumbnails = helper.getTeamThumbnails(session, teams);
         const message = new builder.Message(session).attachments(teamThumbnails).attachmentLayout('carousel');
         session.send(message);
-        builder.Prompts.text(session, `If you type the name, I can load all of the ${session.privateConversationData.position}s for that team.`);
+        console.log(session.privateConversationData);
+        builder.Prompts.text(session, `If you type the name, I can load all of the ${session.privateConversationData.position.Name}s for that team.`);
     },
     (session, results) => { // Get potential players from teamname/position
         const teamChosen = session.privateConversationData.teamChosen = results.response;
@@ -195,7 +196,7 @@ bot.dialog('/comparePlayers', [
         builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
         helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
             console.log(response);
-            builder.Prompts.choice(session, response, ['Choice']);
+            builder.Prompts.choice(session, response, ['See More Details', 'Next Week\'s Projections']);
         });
     },
 ]);
