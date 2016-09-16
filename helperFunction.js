@@ -86,6 +86,8 @@ var helper = function () {
 
     self.getPlayerStatsThumbnail = (session, player) => {
         var thumbnail = new builder.ThumbnailCard(session);
+        var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.esbId + '.png '
+        thumbnail.images([builder.CardImage.create(session, imageUrl)]);
         var text = '';
         thumbnail.title(player.otherstats.displayName)
         thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
@@ -169,7 +171,7 @@ var helper = function () {
             self.getPlayerScoreForComparison(firstNFLID, (response) => {
                 self.getPlayerScoreForComparison(secondNFLID, (secondResponse) => {
                     firstPlayerPoints = response;
-                    secondPlayerPoints =  secondResponse;
+                    secondPlayerPoints = secondResponse;
                     if (secondPlayerPoints < firstPlayerPoints) {
                         betterPlayer = session.privateConversationData.firstPlayerChosen.displayName;
                         worsePlayer = secondPlayerChosen.displayName;
