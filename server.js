@@ -195,9 +195,11 @@ bot.dialog('/comparePlayers', [
         }
         builder.Prompts.text(session, `Great! The second player you selected is ` + secondPlayerChosen.displayName + `\n\n Let's compare  ` + session.privateConversationData.firstPlayerChosen.displayName + ` and ` + secondPlayerChosen.displayName);
         helper.getBestPlayer(session, session.privateConversationData.firstPlayerChosen.nflId, secondPlayerChosen.nflId, secondPlayerChosen, (response) => {
+            console.log("--------------------------------------------");
+            console.log(response);
             builder.Prompts.text(session, response.text);
-            const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
-            session.send(message);
+            // const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
+            // session.send(message);
         });
     },
 ]);

@@ -8,12 +8,10 @@ var helper = function() {
     self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
 
     self.getCurrentTeamThumbnail = (session, team) => {
-        console.log(team)
         var thumbnail = new builder.ThumbnailCard(session);
         thumbnail.title(team.teamname);
         var imageUrl = 'http://i.nflcdn.com/static/site/7.4/img/teams/' + team.abbr + '/' + team.abbr + '_logo-80x90.gif';
         thumbnail.images([builder.CardImage.create(session, imageUrl)])
-        // console.log(thumbnail)
         return thumbnail;
     };
 
@@ -136,7 +134,6 @@ var helper = function() {
     }
 
     self.handlePlayerPromptResults = (session, results) => {
-        console.log(session.message);
         if (!results.response) {
             session.send(`I'm sorry I'm not sure who you're looking for there.`);
             session.send('Let me start a search for  ' + session.message.text + ' for you.');
@@ -156,10 +153,8 @@ var helper = function() {
                 params.otherstats = response[0];
                 params.stats = JSON.parse(response[0].stat);
                 let results = {};
-                console.log(params)
                 results.thumbnail = self.getPlayerStatsThumbnail(session, params);
                 results.playerPoints = (params.stats.passing.yards * .04) + (params.stats.passing.touchdowns * 4) - (params.stats.passing.interceptions * 2) + (params.stats.rushing.yards * .1) + (params.stats.rushing.touchdowns * 6) - (params.stats.rushing.fumblesLost * 2) + (params.stats.receiving.yards * .1) + (params.stats.receiving.touchdowns * 6) - (params.stats.receiving.fumblesLost * 2);
-                console.log(results);
                 callback(results);
             });
         },
