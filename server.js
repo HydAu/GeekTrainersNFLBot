@@ -154,6 +154,7 @@ bot.dialog('/position', [
         }
     }
 ]);
+
 bot.dialog('/comparePlayers', [
     (session) => {
         if (helper.checkForComparePlayers(session)) {
@@ -193,6 +194,9 @@ bot.dialog('/comparePlayers', [
             }
         });
     },
+]);
+
+bot.dialog('/showCompareResults', [
     (session, results) => {
         let secondPlayerChosen;
         if (results.response.entity === 'Yes') {
