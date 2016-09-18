@@ -118,10 +118,7 @@ bot.dialog('/stats', [
             var params = {}
             params.otherstats = response[0];
             params.stats = JSON.parse(response[0].stat);
-            var statThumbnail = helper.getPlayerStatsThumbnail(session, params);
-            var message = new builder.Message(session).attachments([statThumbnail]);
-            session.send(`Here's his most recent week:`);
-            session.send(message);
+            session.send(helper.getPlayerStatsText(session, params));
             session.send(`Let's look for someone else!`);
             session.replaceDialog('/', { message: { text: 'get stats' } });
         });

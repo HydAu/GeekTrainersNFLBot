@@ -2,7 +2,7 @@
 const https = require('https');
 const builder = require('botbuilder');
 var sql = require('./sql.js');
-var helper = function() {
+var helper = function () {
     let self = this;
 
     self.getTeamThumbnails = (session, teams) => teams.map(team => self.getCurrentTeamThumbnail(session, team));
@@ -52,10 +52,10 @@ var helper = function() {
             path: path,
             method: 'GET'
         };
-        var request = https.request(options, function(response) {
+        var request = https.request(options, function (response) {
             var data = '';
-            response.on('data', function(chunk) { data += chunk; });
-            response.on('end', function() {
+            response.on('data', function (chunk) { data += chunk; });
+            response.on('end', function () {
                 callback(JSON.parse(data));
             });
         });
@@ -82,37 +82,24 @@ var helper = function() {
         return thumbnails;
     };
 
-    self.getPlayerStatsThumbnail = (session, player) => {
-        var thumbnail = new builder.ThumbnailCard(session);
-        var imageUrl = 'http://static.nfl.com/static/content/public/static/img/fantasy/transparent/200x200/' + player.otherstats.esbId + '.png '
-        thumbnail.images([builder.CardImage.create(session, imageUrl)]);
-        var text = '';
-        thumbnail.title(player.otherstats.displayName)
-        thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
-        if (player.otherstats.position == 'QB') {
-            text += `Passing: ${player.stats.passing.completions}/${player.stats.passing.attempts},
-            Yards: ${player.stats.passing.yards}\n
-            TDs: ${player.stats.passing.touchdowns}\n
-            INTs: ${player.stats.passing.interceptions}`;
-        }
-        if (player.otherstats.position == 'QB' || player.otherstats.position == 'TE' || player.otherstats.position == 'WR' || player.otherstats.position == 'RB') {
-            text += `
-                Carries: ${player.stats.rushing.carries},\n
-                Yards: ${player.stats.rushing.yards},\n
-                TDs: ${player.stats.rushing.touchdowns},\n
-                Fumbles: ${player.stats.rushing.fumblesLost}`;
-        }
-        if (player.otherstats.position == 'RB' || player.otherstats.position == 'TE' || player.otherstats.position == 'WR') {
-            text += `
-                 Catches: ${player.stats.receiving.catches},\n
-                  Yards: ${player.stats.receiving.yards},\n
-                  TDs: ${player.stats.receiving.touchdowns},\n 
-                  Fumbles: ${player.stats.receiving.fumblesLost}`
+    self.getPlayerStatsText = (session, player) => {
+        var text = `Last week, ${player.otherstats.displayName} posted the following stats: \n\n`;
+        if (player.otherstats.position === 'QB') {
+            text += `He threw ${player.stats.passing.completions} completions on ${player.stats.passing.attempts} attempts and ${player.stats.passing.yards} yards.
+                    He also threw for ${player.stats.passing.touchdowns} TDs and ${player.stats.passing.interceptions} interceptions.
+                    On the ground, he racked up ${player.stats.rushing.yards} on ${player.stats.rushing.carries}, with ${player.stats.rushing.touchdowns} TDs
+                    and ${player.stats.rushing.fumblesLost} fumbles.`;
+        } else if (player.otherstats.position === 'RB') {
+            text += `He carried the ball ${player.stats.rushing.carries} times for ${player.stats.rushing.yards}.
+                    He scored ${player.stats.rushing.touchdowns} TDs, and lost the ball ${player.stats.rushing.fumblesLost} times.
+                    He also caught the ball ${player.stats.receiving.catches} times, put up ${player.stats.receiving.yards} and 
+                    ${player.stats.receiving.touchdowns} TDs.`;
+        } else if (player.otherstats.position === 'TE' || player.otherstats.position === 'WR') {
+            text += `He caught ${player.stats.receiving.catches} balls, for ${player.stats.receiving.yards}. He also scored
+                    ${player.stats.receiving.touchdowns} TDs, while fumbling ${player.stats.receiving.fumblesLost} times.`
         }
 
-        thumbnail.text(text);
-
-        return thumbnail;
+        return text;
     };
 
     self.convertPlayerArrayToPlayerPrompts = (players) => {
@@ -150,7 +137,7 @@ var helper = function() {
         }
     },
         self.getPlayerScoreForComparison = (session, nflID, callback) => {
-            sql.getPlayerStats(nflID, function(response) {
+            sql.getPlayerStats(nflID, function (response) {
                 var params = {}
                 params.otherstats = response[0];
                 params.stats = JSON.parse(response[0].stat);
@@ -195,7 +182,7 @@ var helper = function() {
             });
         },
         self.getStatComparisonFullResults = (session, firstPlayerChosen, secondPlayerChosen) => {
-             self.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
+            self.getBestPlayer(session, firstPlayerChosen.nflId, secondPlayerChosen.nflId, firstPlayerChosen, secondPlayerChosen, (response) => {
                 const message = new builder.Message(session).attachments(response.playerComparisonThumbnails).attachmentLayout('carousel');
                 session.send(message);
                 builder.Prompts.text(session, response.text);
