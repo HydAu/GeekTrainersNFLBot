@@ -80,16 +80,17 @@ bot.dialog('/player', [
                 const message = new builder.Message(session).attachments([thumbnail]);
                 session.send(`I think this is who you're looking for:`)
                 session.send(message);
-                builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+                // builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+                builder.Prompts.confirm(session, 'Is this the player you\'re looking for?');
             } else {
                 session.send("Unable to find that player.");
                 session.endConversation();
-                session.replaceDialog("/"); // ('/', { message: { text: "get stats" } });
+                session.replaceDialog('/', { message: { text: "get stats" } });
             }
         });
     },
     (session, results, next) => {
-        if (results.response.entity.toLowerCase() === 'yes') {
+        if (results.response) {
             if (session.privateConversationData.wantsToCompare === true) {
                 session.endDialogWithResult(results);
             } else {
