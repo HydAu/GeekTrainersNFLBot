@@ -91,22 +91,22 @@ var helper = function() {
         thumbnail.subtitle(`${player.otherstats.year} Season | Week ${player.otherstats.week}`);
         if (player.otherstats.position == 'QB') {
             text += `Passing: ${player.stats.passing.completions}/${player.stats.passing.attempts},
-            Yards: ${player.stats.passing.yards}\n\n
-            TDs: ${player.stats.passing.touchdowns}\n\n
+            Yards: ${player.stats.passing.yards}\n
+            TDs: ${player.stats.passing.touchdowns}\n
             INTs: ${player.stats.passing.interceptions}`;
         }
         if (player.otherstats.position == 'QB' || player.otherstats.position == 'TE' || player.otherstats.position == 'WR' || player.otherstats.position == 'RB') {
             text += `
-                Carries: ${player.stats.rushing.carries},\n\n
-                Yards: ${player.stats.rushing.yards},\n\n
-                TDs: ${player.stats.rushing.touchdowns},\n\n
+                Carries: ${player.stats.rushing.carries},\n
+                Yards: ${player.stats.rushing.yards},\n
+                TDs: ${player.stats.rushing.touchdowns},\n
                 Fumbles: ${player.stats.rushing.fumblesLost}`;
         }
         if (player.otherstats.position == 'RB' || player.otherstats.position == 'TE' || player.otherstats.position == 'WR') {
             text += `
-                 Catches: ${player.stats.receiving.catches},\n\n
-                  Yards: ${player.stats.receiving.yards},\n\n
-                  TDs: ${player.stats.receiving.touchdowns},\n\n 
+                 Catches: ${player.stats.receiving.catches},\n
+                  Yards: ${player.stats.receiving.yards},\n
+                  TDs: ${player.stats.receiving.touchdowns},\n 
                   Fumbles: ${player.stats.receiving.fumblesLost}`
         }
 
