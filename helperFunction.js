@@ -85,18 +85,11 @@ var helper = function () {
     self.getPlayerStatsText = (session, player) => {
         var text = `Last week, ${player.otherstats.displayName} posted the following stats: \n\n`;
         if (player.otherstats.position === 'QB') {
-            text += `He threw ${player.stats.passing.completions} completions on ${player.stats.passing.attempts} attempts and ${player.stats.passing.yards} yards.
-                    He also threw for ${player.stats.passing.touchdowns} TDs and ${player.stats.passing.interceptions} interceptions.
-                    On the ground, he racked up ${player.stats.rushing.yards} on ${player.stats.rushing.carries}, with ${player.stats.rushing.touchdowns} TDs
-                    and ${player.stats.rushing.fumblesLost} fumbles.`;
+            text += `He threw ${player.stats.passing.completions} completions on ${player.stats.passing.attempts} attempts and ${player.stats.passing.yards} yards. He also threw for ${player.stats.passing.touchdowns} TDs and ${player.stats.passing.interceptions} interceptions. On the ground, he racked up ${player.stats.rushing.yards} on ${player.stats.rushing.carries}, with ${player.stats.rushing.touchdowns} TDs and ${player.stats.rushing.fumblesLost} fumbles.`;
         } else if (player.otherstats.position === 'RB') {
-            text += `He carried the ball ${player.stats.rushing.carries} times for ${player.stats.rushing.yards}.
-                    He scored ${player.stats.rushing.touchdowns} TDs, and lost the ball ${player.stats.rushing.fumblesLost} times.
-                    He also caught the ball ${player.stats.receiving.catches} times, put up ${player.stats.receiving.yards} and 
-                    ${player.stats.receiving.touchdowns} TDs.`;
+            text += `He carried the ball ${player.stats.rushing.carries} times for ${player.stats.rushing.yards}. He scored ${player.stats.rushing.touchdowns} TDs, and lost the ball ${player.stats.rushing.fumblesLost} times. He also caught the ball ${player.stats.receiving.catches} times, put up ${player.stats.receiving.yards} and ${player.stats.receiving.touchdowns} TDs.`;
         } else if (player.otherstats.position === 'TE' || player.otherstats.position === 'WR') {
-            text += `He caught ${player.stats.receiving.catches} balls, for ${player.stats.receiving.yards}. He also scored
-                    ${player.stats.receiving.touchdowns} TDs, while fumbling ${player.stats.receiving.fumblesLost} times.`
+            text += `He caught ${player.stats.receiving.catches} balls, for ${player.stats.receiving.yards}. He also scored ${player.stats.receiving.touchdowns} TDs, while fumbling ${player.stats.receiving.fumblesLost} times.`
         }
 
         return text;
