@@ -120,8 +120,9 @@ bot.dialog('/stats', [
             params.otherstats = response[0];
             params.stats = JSON.parse(response[0].stat);
             session.send(helper.getPlayerStatsText(session, params));
-            session.send(`Let's look for someone else!`);
-            session.replaceDialog('/', { message: { text: 'get stats' } });
+            session.send(`Let's look for someone else! You can "get stats" or "compare players".`);
+            // session.replaceDialog('/', { message: { text: 'get stats' } });
+            session.endConversation();
         });
     }
 ])
