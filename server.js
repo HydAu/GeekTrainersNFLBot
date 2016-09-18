@@ -29,17 +29,11 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
         (session, args, next) => {
             session.send(`Hi there! I'm the NFL Fantasy bot. I can help you research players, or to figure out who to start next week.`);
             session.send(`Let's get started!`);
-            builder.Prompts.choice(session, 'What would you like to do?', ['Get stats', 'Compare players'], {maxRetries: 0});
+            builder.Prompts.text(session, `You can tell me to "get stats" or "compare players".`);
+            //builder.Prompts.choice(session, 'What would you like to do?', ['Get stats', 'Compare players'], {maxRetries: 0});
         },
         (session, results, next) => {
-            let response = '';
-            if(results.response) {
-                response = results.response.entity.toLowerCase();
-                console.log(results.response.entity);
-            } else {
-                response = session.message.text;
-            }
-            session.replaceDialog('/', { message: { text: response } });
+            session.replaceDialog('/', { message: { text: results.response } });
         }])
     .matches('GetStats', [
         (session, args, next) => {
@@ -86,16 +80,17 @@ bot.dialog('/player', [
                 const message = new builder.Message(session).attachments([thumbnail]);
                 session.send(`I think this is who you're looking for:`)
                 session.send(message);
-                builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+                // builder.Prompts.choice(session, 'Is this player correct?', ['Yes', 'No']);
+                builder.Prompts.confirm(session, 'Is this the player you\'re looking for?');
             } else {
                 session.send("Unable to find that player.");
                 session.endConversation();
-                session.replaceDialog("/"); // ('/', { message: { text: "get stats" } });
+                session.replaceDialog('/', { message: { text: "get stats" } });
             }
         });
     },
     (session, results, next) => {
-        if (results.response.entity.toLowerCase() === 'yes') {
+        if (results.response) {
             if (session.privateConversationData.wantsToCompare === true) {
                 session.endDialogWithResult(results);
             } else {
@@ -125,8 +120,9 @@ bot.dialog('/stats', [
             params.otherstats = response[0];
             params.stats = JSON.parse(response[0].stat);
             session.send(helper.getPlayerStatsText(session, params));
-            session.send(`Let's look for someone else!`);
-            session.replaceDialog('/', { message: { text: 'get stats' } });
+            session.send(`Let's look for someone else! You can "get stats" or "compare players".`);
+            // session.replaceDialog('/', { message: { text: 'get stats' } });
+            session.endConversation();
         });
     }
 ])
