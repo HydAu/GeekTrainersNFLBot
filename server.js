@@ -29,10 +29,16 @@ const dialog = new builder.IntentDialog({ recognizers: [recognizer] })
         (session, args, next) => {
             session.send(`Hi there! I'm the NFL Fantasy bot. I can help you research players, or to figure out who to start next week.`);
             session.send(`Let's get started!`);
-            builder.Prompts.choice(session, 'What would you like to do?', ['Get Player Stats', 'Compare Players']);
+            builder.Prompts.choice(session, 'What would you like to do?', ['Get stats', 'Compare players'], {maxRetries: 0});
         },
         (session, results, next) => {
-            let response = results.response.entity.toLowerCase();
+            let response = '';
+            if(results.response) {
+                response = results.response.entity.toLowerCase();
+                console.log(results.response.entity);
+            } else {
+                response = session.message.text;
+            }
             session.replaceDialog('/', { message: { text: response } });
         }])
     .matches('GetStats', [
